@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0e1a">
+<title>天使聖所 · Angel Sanctuary</title>
+<link rel="manifest" href='data:application/manifest+json,{"name":"天使聖所","short_name":"天使聖所","start_url":"./","display":"standalone","background_color":"%230a0e1a","theme_color":"%230a0e1a","lang":"zh-HK"}'>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://js.puter.com/v2/"></script>
+<style>
+  :root { --gold:#d4af37; }
+  * { -webkit-tap-highlight-color: transparent; box-sizing:border-box; }
+  body { margin:0; background:radial-gradient(ellipse at top,#141b2e 0%,#0a0e1a 60%,#05070d 100%);
+    color:#e8e6e0; font-family:-apple-system,"PingFang HK","Microsoft JhengHei",sans-serif;
+    min-height:100vh; overflow-x:hidden; }
+  .starfield::before { content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image:radial-gradient(1px 1px at 20% 30%,rgba(255,255,255,.4),transparent),
+      radial-gradient(1px 1px at 70% 60%,rgba(255,255,255,.3),transparent),
+      radial-gradient(1px 1px at 40% 80%,rgba(255,255,255,.25),transparent),
+      radial-gradient(1px 1px at 85% 20%,rgba(255,255,255,.35),transparent); }
+  .glass { background:rgba(255,255,255,.04); backdrop-filter:blur(14px); border:1px solid rgba(212,175,55,.15); }
+  .gold { color:var(--gold); }
+  .btn { transition:all .35s cubic-bezier(.4,0,.2,1); cursor:pointer; }
+  .btn:active { transform:scale(.96); }
+  .glow { box-shadow:0 0 40px rgba(212,175,55,.25); }
+  .fade { animation:fade .8s ease; }
+  @keyframes fade { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+  .pulse-ring { animation:pr 4s ease-in-out infinite; }
+  @keyframes pr { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.12);opacity:1} }
+  .chakra-dot { transition:all .3s; cursor:pointer; }
+  .chakra-dot:hover { transform:scale(1.3); filter:brightness(1.4); }
+  .chakra-dot.active { transform:scale(1.4); filter:brightness(1.6); }
+  .script-line { line-height:2.1; letter-spacing:.02em; }
+  .hl { background:rgba(212,175,55,.3); border-radius:3px; }
+  .typing-dot { animation:td 1.4s infinite; } .typing-dot:nth-child(2){animation-delay:.2s} .typing-dot:nth-child(3){animation-delay:.4s}
+  @keyframes td { 0%,60%,100%{opacity:.3} 30%{opacity:1} }
+  .avatar { width:28px; height:28px; border-radius:50%; border:1px solid rgba(212,175,55,.4); }
+  .admin-badge { background:linear-gradient(135deg,rgba(212,175,55,.3),rgba(212,175,55,.1)); border:1px solid rgba(212,175,55,.5); }
+  ::-webkit-scrollbar { width:6px } ::-webkit-scrollbar-thumb { background:rgba(212,175,55,.3); border-radius:3px }
+  .breath-circle { animation:breath 8s ease-in-out infinite; }
+  @keyframes breath { 0%,100%{transform:scale(1); opacity:.5} 50%{transform:scale(1.5); opacity:.9} }
+  .lotus { animation:lotus 6s ease-in-out infinite; }
+  @keyframes lotus { 0%,100%{transform:scale(1) rotate(0deg); opacity:.6} 50%{transform:scale(1.1) rotate(3deg); opacity:1} }
+  .gold-glow { text-shadow: 0 0 20px rgba(212,175,55,.6), 0 0 40px rgba(212,175,55,.3); }
+  /* 歡迎畫面 */
+  #welcomeScreen { position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(ellipse at center,#141b2e 0%,#0a0e1a 60%,#05070d 100%); transition:opacity 1s ease, visibility 1s ease; }
+  #welcomeScreen.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+  .welcome-btn { animation:welcomePulse 3s ease-in-out infinite; }
+  @keyframes welcomePulse { 0%,100%{transform:scale(1); box-shadow:0 0 30px rgba(212,175,55,.3)} 50%{transform:scale(1.05); box-shadow:0 0 60px rgba(212,175,55,.6)} }
+</style>
+</head>
+<body class="starfield">
+
+<!-- 歡迎畫面 -->
+<div id="welcomeScreen">
+  <div class="text-center px-6">
+    <div class="w-36 h-36 mx-auto rounded-full border-2 border-amber-400/30 flex items-center justify-center mb-6 pulse-ring">
+      <div class="w-24 h-24 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent flex items-center justify-center">
+        <span class="text-5xl">🕯️</span>
+      </div>
+    </div>
+    <h1 class="text-3xl font-light gold tracking-widest mb-2">天使聖所</h1>
+    <p class="text-xs text-white/40 tracking-[0.3em] mb-8">ANGEL SANCTUARY</p>
+    <p class="text-white/50 text-sm leading-relaxed mb-8 max-w-xs mx-auto">
+      呢度係一個神聖嘅空間。<br>Angel 會陪伴你，與你同行。
+    </p>
+    <button onclick="enterSanctuary()" class="welcome-btn px-10 py-4 rounded-full bg-gradient-to-r from-amber-500/40 to-amber-400/10 border border-amber-400/50 gold text-lg btn glow">
+      🕊️ 進入聖所
+    </button>
+    <p class="text-[10px] text-white/20 mt-6">點擊進入 · 背景音樂將自動播放</p>
+  </div>
+</div>
+
+<!-- 背景音樂 -->
+<audio id="bgMusic" loop preload="auto">
+  <source src="bg-music.mp3" type="audio/mpeg">
+</audio>
+
+<main class="relative z-10 max-w-3xl mx-auto px-4 pt-6 pb-24">
+  <header class="flex items-center justify-between mb-6 fade">
+    <div>
+      <h1 class="text-2xl font-light gold tracking-widest">天使聖所</h1>
+      <p class="text-[11px] text-white/40 tracking-wider">ANGEL SANCTUARY</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <img id="userAvatar" class="avatar hidden" alt="">
+      <span id="userName" class="text-xs text-amber-200/70 max-w-[100px] truncate"></span>
+      <span id="adminBadge" class="hidden text-[10px] px-2 py-0.5 rounded-full admin-badge gold">管理員</span>
+      <!-- 合併登入按鈕 -->
+      <button id="unifiedAuthBtn" onclick="handleUnifiedAuth()" class="text-xs text-white/50 hover:text-amber-200 btn">登入</button>
+      <button id="logoutBtn" onclick="handleLogout()" class="text-xs text-white/50 hover:text-amber-200 btn hidden">登出</button>
+      <!-- 背景音樂開關 -->
+      <button id="musicToggle" onclick="toggleMusic()" class="text-xs text-white/40 hover:text-amber-200 btn ml-1" title="背景音樂">🔊</button>
+    </div>
+  </header>
+
+  <!-- HOME -->
+  <section id="view-home" class="view fade">
+    <div class="text-center mb-8">
+      <div class="w-32 h-32 mx-auto rounded-full border border-amber-400/30 flex items-center justify-center pulse-ring mb-4">
+        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent flex items-center justify-center">
+          <span class="text-3xl">🕯️</span>
+        </div>
+      </div>
+      <p class="text-white/60 text-sm leading-relaxed max-w-md mx-auto">
+        呢度係一個神聖嘅空間。<br>Angel 會陪伴你，與你同行。<br>真正嘅體驗，由你自己內心出現。
+      </p>
+    </div>
+    <div class="grid gap-3">
+      <button onclick="go('angel')" class="glass rounded-2xl p-5 text-left btn hover:glow">
+        <div class="flex items-center gap-4"><span class="text-2xl">🕊️</span>
+          <div><div class="gold font-medium">Angel 對話</div><div class="text-xs text-white/40">Puter 免費 AI · 主動引導 · 雲端記憶</div></div></div>
+      </button>
+      <button onclick="go('lang')" class="glass rounded-2xl p-5 text-left btn">
+        <div class="flex items-center gap-4"><span class="text-2xl">🌬️</span>
+          <div><div class="gold font-medium">催眠引導</div><div class="text-xs text-white/40">三語言 · 神聖空間 · 逐字高亮</div></div></div>
+      </button>
+      <button onclick="go('samadhi')" class="glass rounded-2xl p-5 text-left btn">
+        <div class="flex items-center gap-4"><span class="text-2xl">🧘</span>
+          <div><div class="gold font-medium">入定催眠</div><div class="text-xs text-white/40">短 7 · 中 21 · 長 45 分鐘</div></div></div>
+      </button>
+      <button onclick="go('deep')" class="glass rounded-2xl p-5 text-left btn">
+        <div class="flex items-center gap-4"><span class="text-2xl">🌌</span>
+          <div><div class="gold font-medium">深度催眠 · 與高我同在</div><div class="text-xs text-white/40">15 · 30 · 60 分鐘 · 脈輪上升</div></div></div>
+      </button>
+      <button onclick="go('reiki')" class="glass rounded-2xl p-5 text-left btn">
+        <div class="flex items-center gap-4"><span class="text-2xl">🌿</span>
+          <div><div class="gold font-medium">靈氣療癒</div><div class="text-xs text-white/40">自我療癒 · 遙距療癒</div></div></div>
+      </button>
+      <button onclick="go('amitabha')" class="glass rounded-2xl p-5 text-left btn">
+        <div class="flex items-center gap-4"><span class="text-2xl">🙏</span>
+          <div><div class="gold font-medium">彌陀願海</div><div class="text-xs text-white/40">四十八願 · 發願往生 · 佛號念佛</div></div></div>
+      </button>
+      <button onclick="go('audio')" class="glass rounded-2xl p-5 text-left btn">
+        <div class="flex items-center gap-4"><span class="text-2xl">🎵</span>
+          <div><div class="gold font-medium">音頻療癒</div><div class="text-xs text-white/40">Solfeggio 頻率 · 雙耳節拍</div></div></div>
+      </button>
+      <button onclick="go('chakra')" class="glass rounded-2xl p-5 text-left btn">
+        <div class="flex items-center gap-4"><span class="text-2xl">☸️</span>
+          <div><div class="gold font-medium">三脈七輪</div><div class="text-xs text-white/40">種子音 · 手印 · 四模式療癒</div></div></div>
+      </button>
+      <button onclick="go('journal')" class="glass rounded-2xl p-5 text-left btn">
+        <div class="flex items-center gap-4"><span class="text-2xl">📖</span>
+          <div><div class="gold font-medium">記錄與分辨</div><div class="text-xs text-white/40">雙紙對照 · 來源標籤</div></div></div>
+      </button>
+    </div>
+  </section>
+
+  <!-- LANG -->
+  <section id="view-lang" class="view hidden fade">
+    <h2 class="text-xl gold mb-2 font-light">選擇引導語言</h2>
+    <p class="text-xs text-white/40 mb-6">Choose your guidance language</p>
+    <div class="grid gap-3">
+      <button onclick="setLang('zh-HK')" class="glass rounded-2xl p-6 btn text-left hover:glow">
+        <div class="text-lg">粵語</div><div class="text-xs text-white/40">Cantonese · zh-HK</div></button>
+      <button onclick="setLang('zh-CN')" class="glass rounded-2xl p-6 btn text-left">
+        <div class="text-lg">普通話</div><div class="text-xs text-white/40">Mandarin · zh-CN</div></button>
+      <button onclick="setLang('en-US')" class="glass rounded-2xl p-6 btn text-left">
+        <div class="text-lg">English</div><div class="text-xs text-white/40">English · en-US</div></button>
+    </div>
+    <button onclick="go('home')" class="mt-6 text-xs text-white/40 hover:text-amber-200 btn">← 返回</button>
+  </section>
+
+  <!-- ANGEL -->
+  <section id="view-angel" class="view hidden fade">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl gold font-light">🕊️ Angel</h2>
+      <button onclick="openSettings()" class="text-xs text-white/50 hover:text-amber-200 btn">⚙️ 設定</button>
+    </div>
+    <div id="modeBadge" class="glass rounded-xl px-4 py-2 mb-3 text-xs text-white/50 flex items-center justify-between">
+      <span id="modeLabel">Puter 免費 AI</span>
+      <span id="modeStatus" class="text-amber-200/60">真 AI · 免費無限</span>
+    </div>
+    
+    <!-- 🟢 新增：AI 模型選擇按鈕 -->
+    <div class="flex gap-2 mb-4">
+      <button id="modelDeepSeek" onclick="setAIModel('deepseek/deepseek-chat')" class="flex-1 py-2 rounded-xl bg-amber-400/20 border border-amber-400/50 text-xs gold btn">🧠 DeepSeek</button>
+      <button id="modelGPT" onclick="setAIModel('openai/gpt-4o')" class="flex-1 py-2 rounded-xl bg-white/5 border border-white/10 text-white/50 text-xs btn">🤖 GPT-4o</button>
+    </div>
+
+    <div id="chatArea" class="glass rounded-2xl p-4 mb-4 min-h-[300px] max-h-[420px] overflow-y-auto space-y-3"></div>
+    <div class="flex gap-2 mb-4">
+      <input id="chatInput" type="text" placeholder="寫低你想問嘅問題…"
+        class="flex-1 bg-black/30 rounded-xl px-4 py-3 text-sm outline-none border border-white/10 focus:border-amber-400/40"
+        onkeydown="if(event.key==='Enter')sendMessage()">
+      <button onclick="sendMessage()" class="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500/30 to-amber-400/10 border border-amber-400/40 gold btn text-sm">傳送</button></div>
+    <div class="flex flex-wrap gap-2 mb-4">
+      <button onclick="quickAction('靜心')" class="px-3 py-1.5 rounded-full text-xs bg-white/5 border border-white/10 text-white/50 btn">🫁 引導靜心</button>
+      <button onclick="quickAction('反問')" class="px-3 py-1.5 rounded-full text-xs bg-white/5 border border-white/10 text-white/50 btn">🔄 反問自己</button>
+      <button onclick="quickAction('經文')" class="px-3 py-1.5 rounded-full text-xs bg-white/5 border border-white/10 text-white/50 btn">📜 隨機經文</button>
+      <button onclick="saveChatToJournal()" class="px-3 py-1.5 rounded-full text-xs bg-white/5 border border-white/10 text-white/50 btn">💾 存入記錄</button>
+      <button onclick="clearChat()" class="px-3 py-1.5 rounded-full text-xs bg-white/5 border border-white/10 text-white/40 btn">🗑️ 清空</button></div>
+    <button onclick="go('home')" class="mt-4 text-xs text-white/40 hover:text-amber-200 btn">← 返回</button>
+  </section>
+
+  <!-- HYPNO -->
+  <section id="view-hypno" class="view hidden fade">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl gold font-light">催眠引導</h2>
+      <span id="hypnoLangLabel" class="text-xs text-white/40"></span></div>
+    <div class="glass rounded-2xl p-6 mb-4 min-h-[220px] flex items-center">
+      <p id="hypnoText" class="script-line text-lg text-white/85"></p></div>
+    <div class="flex items-center justify-center gap-4 mb-6">
+      <button id="btnPlay" onclick="togglePlay()" class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400/30 to-amber-600/10 border border-amber-400/40 flex items-center justify-center text-3xl btn glow">▶</button></div>
+    <div class="flex justify-between text-xs text-white/40 mb-2">
+      <span id="phaseLabel">準備</span><span id="progLabel">0 / 3</span></div>
+    <div class="h-1 bg-white/10 rounded-full overflow-hidden">
+      <div id="progBar" class="h-full bg-gradient-to-r from-amber-400 to-amber-200 w-0 transition-all duration-700"></div></div>
+    <button onclick="go('home')" class="mt-6 text-xs text-white/40 hover:text-amber-200 btn">← 返回</button>
+  </section>
+
+  <!-- SAMADHI -->
+  <section id="view-samadhi" class="view hidden fade">
+    <h2 class="text-xl gold mb-2 font-light">🧘 入定催眠</h2>
+    <p class="text-xs text-white/40 mb-5">選擇時長，進入深度放鬆。</p>
+    <div class="grid grid-cols-3 gap-3 mb-5">
+      <button onclick="startSamadhi(7)" class="glass rounded-2xl p-4 btn text-center">
+        <div class="text-2xl gold mb-1">7</div><div class="text-xs text-white/50">短 · 分鐘</div></button>
+      <button onclick="startSamadhi(21)" class="glass rounded-2xl p-4 btn text-center">
+        <div class="text-2xl gold mb-1">21</div><div class="text-xs text-white/50">中 · 分鐘</div></button>
+      <button onclick="startSamadhi(45)" class="glass rounded-2xl p-4 btn text-center">
+        <div class="text-2xl gold mb-1">45</div><div class="text-xs text-white/50">長 · 分鐘</div></button>
+    </div>
+    <div class="glass rounded-2xl p-5 mb-4">
+      <div class="text-xs gold mb-2">背景頻率</div>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="setSamadhiFreq(432)" class="px-3 py-1.5 rounded-full text-xs bg-white/5 border border-white/10 text-white/50 btn">432 Hz</button>
+        <button onclick="setSamadhiFreq(528)" class="px-3 py-1.5 rounded-full text-xs bg-white/5 border border-white/10 text-white/50 btn">528 Hz</button>
+        <button onclick="setSamadhiFreq(0)" class="px-3 py-1.5 rounded-full text-xs bg-white/5 border border-white/10 text-white/50 btn">無</button>
+      </div>
+    </div>
+    <div id="samadhiPlayer" class="hidden">
+      <div class="glass rounded-2xl p-6 mb-4 flex flex-col items-center">
+        <div class="relative w-40 h-40 mb-4">
+          <div class="breath-circle absolute inset-0 rounded-full border-2 border-amber-400/40 flex items-center justify-center">
+            <span class="text-4xl">🧘</span>
+          </div>
+        </div>
+        <div id="samadhiPhase" class="text-sm gold mb-2">準備</div>
+        <div id="samadhiTime" class="text-2xl font-light text-white/80">00:00</div>
+      </div>
+      <button onclick="stopSamadhi()" class="w-full py-3 rounded-xl border border-amber-400/30 text-amber-200 text-sm btn">結束</button>
+    </div>
+    <button onclick="go('home')" class="mt-6 text-xs text-white/40 hover:text-amber-200 btn">← 返回</button>
+  </section>
+
+  <!-- DEEP -->
+  <section id="view-deep" class="view hidden fade">
+    <h2 class="text-xl gold mb-2 font-light">🌌 深度催眠 · 與高我同在</h2>
+    <p class="text-xs text-white/40 mb-5">象徵性引導。真正體驗由你內心出現。</p>
+    <div class="grid grid-cols-3 gap-3 mb-5">
+      <button onclick="startDeep(15)" class="glass rounded-2xl p-4 btn text-center">
+        <div class="text-2xl gold mb-1">15</div><div class="text-xs text-white/50">第一層</div></button>
+      <button onclick="startDeep(30)" class="glass rounded-2xl p-4 btn text-center">
+        <div class="text-2xl gold mb-1">30</div><div class="text-xs text-white/50">第二層</div></button>
+      <button onclick="startDeep(60)" class="glass rounded-2xl p-4 btn text-center">
+        <div class="text-2xl gold mb-1">60</div><div class="text-xs text-white/50">第三層</div></button>
+    </div>
+    <div id="deepPlayer" class="hidden">
+      <div class="glass rounded-2xl p-6 mb-4 flex flex-col items-center">
+        <div class="relative w-40 h-40 mb-4">
+          <div class="breath-circle absolute inset-0 rounded-full border-2 border-amber-400/40 flex items-center justify-center">
+            <span class="text-4xl">🌌</span>
+          </div>
+        </div>
+        <div id="deepPhase" class="text-sm gold mb-2">準備</div>
+        <div id="deepTime" class="text-2xl font-light text-white/80">00:00</div>
+      </div>
+      <button onclick="stopDeep()" class="w-full py-3 rounded-xl border border-amber-400/30 text-amber-200 text-sm btn">結束</button>
+    </div>
+    <button onclick="go('home')" class="mt-6 text-xs text-white/40 hover:text-amber-200 btn">← 返回</button>
+  </section>
+
+  <!-- REIKI -->
+  <section id="view-reiki" class="view hidden fade">
+    <h2 class="text-xl gold mb-2 font-light">🌿 靈氣療癒</h2>
+    <div class="grid grid-cols-2 gap-3 mb-5">
+      <button onclick="reikiMode('self')" class="glass rounded-2xl p-5 btn text-center">
+        <div class="text-3xl mb-2">🙌</div><div class="gold">自我療癒</div></button>
+      <button onclick="reikiMode('remote')" class="glass rounded-2xl p-5 btn text-center">
+        <div class="text-3xl mb-2">🌐</div><div class="gold">遙距療癒</div></button>
+    </div>
+    <div id="reikiSelf" class="hidden">
+      <div class="glass rounded-2xl p-5 mb-4">
+        <div class="text-xs gold mb-3">選擇時長</div>
+        <div class="flex gap-2">
+          <button onclick="startReikiSelf(15)" class="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs btn">15 分鐘</button>
+          <button onclick="startReikiSelf(30)" class="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs btn">30 分鐘</button>
+          <button onclick="startReikiSelf(60)" class="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs btn">60 分鐘</button>
+        </div>
+      </div>
+      <div id="reikiSelfPlayer" class="hidden">
+        <div class="glass rounded-2xl p-6 mb-4 text-center">
+          <div class="text-sm gold mb-2" id="reikiHandName">頂輪</div>
+          <div class="text-xs text-white/50 mb-4" id="reikiHandDesc">頭頂 · 3 分鐘</div>
+          <div class="text-3xl mb-4" id="reikiHandEmoji">🙌</div>
+          <div class="text-xl font-light" id="reikiSelfTime">03:00</div>
+        </div>
+        <button onclick="stopReikiSelf()" class="w-full py-3 rounded-xl border border-amber-400/30 text-amber-200 text-sm btn">結束</button>
+      </div>
+    </div>
+    <div id="reikiRemote" class="hidden">
+      <div class="glass rounded-2xl p-5 mb-4">
+        <label class="text-xs gold block mb-2">對象</label>
+        <input id="reikiTarget" type="text" placeholder="名字或情境" class="w-full bg-black/30 rounded-xl px-4 py-3 text-sm outline-none border border-white/10 focus:border-amber-400/40 mb-3">
+        <label class="text-xs gold block mb-2">意圖</label>
+        <input id="reikiIntent" type="text" placeholder="清晰、具體、善意" class="w-full bg-black/30 rounded-xl px-4 py-3 text-sm outline-none border border-white/10 focus:border-amber-400/40 mb-3">
+        <div class="text-xs gold mb-2">時長</div>
+        <div class="flex gap-2 mb-4">
+          <button onclick="startReikiRemote(10)" class="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs btn">10 分鐘</button>
+          <button onclick="startReikiRemote(20)" class="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs btn">20 分鐘</button>
+          <button onclick="startReikiRemote(30)" class="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs btn">30 分鐘</button>
+        </div>
+        <p class="text-[10px] text-white/30">必須先得到對方同意。療癒後必須切斷連結。</p>
+      </div>
+      <div id="reikiRemotePlayer" class="hidden">
+        <div class="glass rounded-2xl p-6 mb-4 text-center">
+          <div class="text-sm gold mb-2">距離符號</div>
+          <div class="text-xs text-white/50 mb-4">Hon Sha Ze Sho Nen</div>
+          <div class="text-4xl mb-4">🌐</div>
+          <div class="text-xl font-light" id="reikiRemoteTime">10:00</div>
+        </div>
+        <button onclick="stopReikiRemote()" class="w-full py-3 rounded-xl border border-amber-400/30 text-amber-200 text-sm btn">結束</button>
+      </div>
+    </div>
+    <button onclick="go('home')" class="mt-6 text-xs text-white/40 hover:text-amber-200 btn">← 返回</button>
+  </section>
+
+  <!-- AMITABHA -->
+  <section id="view-amitabha" class="view hidden fade">
+    <div class="text-center mb-6">
+      <div class="w-24 h-24 mx-auto rounded-full border border-amber-400/40 flex items-center justify-center lotus mb-3">
+        <span class="text-4xl gold-glow">🙏</span>
+      </div>
+      <h2 class="text-xl gold font-light">彌陀願海</h2>
+      <p class="text-xs text-white/40 mt-1">四十八願 · 發願往生 · 佛號念佛</p>
+    </div>
+
+    <div class="glass rounded-2xl p-5 mb-4">
+      <div class="text-sm gold mb-3">選擇修持模式</div>
+      <div class="grid gap-2">
+        <button onclick="startAmitabha('sit')" class="p-4 rounded-xl bg-white/5 border border-white/10 text-left btn hover:border-amber-400/40">
+          <div class="text-sm gold">🧘 日常靜坐</div>
+          <div class="text-[10px] text-white/50">靜坐 · 入定 · 觀照 · 呼吸 · 發願</div></button>
+        <button onclick="startAmitabha('vows')" class="p-4 rounded-xl bg-white/5 border border-white/10 text-left btn hover:border-amber-400/40">
+          <div class="text-sm gold">📜 四十八願領受</div>
+          <div class="text-[10px] text-white/50">逐願讀誦 · 領受彌陀願力</div></button>
+        <button onclick="startAmitabha('chant')" class="p-4 rounded-xl bg-white/5 border border-white/10 text-left btn hover:border-amber-400/40">
+          <div class="text-sm gold">📿 佛號念佛</div>
+          <div class="text-[10px] text-white/50">四字四音 · 六字二音 · 金剛念 · 默念</div></button>
+      </div>
+    </div>
+
+    <div class="glass rounded-2xl p-5 mb-4">
+      <div class="text-xs gold mb-3">時長</div>
+      <div class="grid grid-cols-3 gap-2" id="amitabhaDurations">
+        <button onclick="setAmitabhaDuration(15)" class="py-3 rounded-lg bg-white/5 border border-white/10 text-sm btn">15</button>
+        <button onclick="setAmitabhaDuration(30)" class="py-3 rounded-lg bg-amber-400/20 border border-amber-400/50 text-sm btn gold">30</button>
+        <button onclick="setAmitabhaDuration(45)" class="py-3 rounded-lg bg-white/5 border border-white/10 text-sm btn">45</button>
+      </div>
+      <p class="text-[10px] text-white/30 mt-2">單位：分鐘</p>
+    </div>
+
+    <div class="glass rounded-2xl p-5 mb-4" id="chantOptions" style="display:none;">
+      <div class="text-xs gold mb-3">念佛方式</div>
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="setChantType('四字四音')" class="py-2 rounded-lg bg-white/5 border border-white/10 text-xs btn">四字四音</button>
+        <button onclick="setChantType('六字二音')" class="py-3 rounded-lg bg-white/5 border border-white/10 text-xs btn">六字二音</button>
+        <button onclick="setChantType('金剛念誦')" class="py-2 rounded-lg bg-white/5 border border-white/10 text-xs btn">金剛念誦</button>
+        <button onclick="setChantType('默念')" class="py-2 rounded-lg bg-white/5 border border-white/10 text-xs btn">默念</button>
+      </div>
+    </div>
+
+    <div id="amitabhaPlayer" class="hidden">
+      <div class="glass rounded-2xl p-6 mb-4 text-center">
+        <div class="text-4xl mb-3 lotus">🪷</div>
+        <div id="amitabhaPhase" class="text-sm gold mb-2">準備</div>
+        <div id="amitabhaVerse" class="text-sm text-white/70 mb-4 script-line min-h-[60px]"></div>
+        <div id="amitabhaTime" class="text-3xl font-light text-white/80">00:00</div>
+      </div>
+      <button onclick="stopAmitabha()" class="w-full py-3 rounded-xl border border-amber-400/30 text-amber-200 text-sm btn">結束</button>
+    </div>
+
+    <button onclick="go('home')" class="mt-6 text-xs text-white/40 hover:text-amber-200 btn">← 返回</button>
+  </section>
+
+  <!-- AUDIO -->
+  <section id="view-audio" class="view hidden fade">
+    <h2 class="text-xl gold mb-2 font-light">音頻療癒能量</h2>
+    <p class="text-xs text-white/40 mb-5">Solfeggio 頻率 + 雙耳節拍。雙耳節拍需佩戴耳機。</p>
+    <div class="glass rounded-2xl p-5 mb-4">
+      <div class="text-sm gold mb-3">Solfeggio 頻率</div>
+      <div id="freqList" class="grid grid-cols-2 gap-2"></div></div>
+    <div class="glass rounded-2xl p-5 mb-4">
+      <div class="text-sm gold mb-3">雙耳節拍（需耳機）</div>
+      <div id="beatList" class="grid grid-cols-2 gap-2"></div></div>
+    <div class="glass rounded-2xl p-5">
+      <div class="flex justify-between text-xs text-white/50 mb-2"><span>音量</span><span id="volLabel">30%</span></div>
+      <input id="vol" type="range" min="0" max="100" value="30" class="w-full accent-amber-400" oninput="setVol(this.value)">
+      <button onclick="stopAudio()" class="mt-4 w-full py-3 rounded-xl border border-amber-400/30 text-amber-200 text-sm btn">停止播放</button></div>
+    <button onclick="go('home')" class="mt-4 text-xs text-white/40 hover:text-amber-200 btn">← 返回</button>
+  </section>
+
+  <!-- CHAKRA -->
+  <section id="view-chakra" class="view hidden fade">
+    <h2 class="text-xl gold mb-2 font-light">三脈七輪</h2>
+    <p class="text-xs text-white/40 mb-5">點擊脈輪查看詳情，標記今日感受。</p>
+    <div class="glass rounded-2xl p-6 mb-4"><div id="chakraMap" class="flex flex-col items-center gap-3 py-4"></div></div>
+    <div id="chakraDetail" class="glass rounded-2xl p-5 mb-4 hidden">
+      <div id="chakraName" class="text-lg gold mb-1"></div>
+      <div id="chakraInfo" class="text-xs text-white/50 mb-3"></div>
+      <div id="chakraAffirm" class="text-sm text-white/80 italic mb-4"></div>
+      <div class="text-xs gold mb-2">🙏 手印</div>
+      <div id="chakraMudra" class="text-xs text-white/60 mb-4"></div>
+      <div class="text-xs gold mb-2">🔊 種子音</div>
+      <button id="chakraSeed" onclick="playSeed()" class="w-full py-2 mb-4 rounded-lg bg-white/5 border border-white/10 text-xs btn"></button>
+      <div class="text-xs gold mb-2">🎵 音頻療癒模式</div>
+      <div class="grid grid-cols-4 gap-2 mb-4">
+        <button onclick="chakraMode('activate')" class="py-2 rounded-lg bg-white/5 border border-white/10 text-[10px] btn">🔥激活</button>
+        <button onclick="chakraMode('heal')" class="py-2 rounded-lg bg-white/5 border border-white/10 text-[10px] btn">💚療癒</button>
+        <button onclick="chakraMode('repair')" class="py-2 rounded-lg bg-white/5 border border-white/10 text-[10px] btn">🩹修復</button>
+        <button onclick="chakraMode('inspire')" class="py-2 rounded-lg bg-white/5 border border-white/10 text-[10px] btn">💡啟發</button>
+      </div>
+      <div class="text-xs text-white/50 mb-2">今日感受</div>
+      <div class="flex gap-2">
+        <button onclick="markChakra('活躍')" class="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs btn">活躍</button>
+        <button onclick="markChakra('平衡')" class="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs btn">平衡</button>
+        <button onclick="markChakra('安靜')" class="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs btn">安靜</button></div></div>
+    <button onclick="go('home')" class="text-xs text-white/40 hover:text-amber-200 btn">← 返回</button>
+  </section>
+
+  <!-- JOURNAL -->
+  <section id="view-journal" class="view hidden fade">
+    <h2 class="text-xl gold mb-2 font-light">記錄與分辨</h2>
+    <p id="syncStatus" class="text-[10px] text-white/30 mb-5">本地模式 · 登入後自動雲端同步</p>
+    <div class="glass rounded-2xl p-5 mb-4">
+      <label class="text-xs gold block mb-2">連結前 · 我自己嘅答案</label>
+      <textarea id="before" rows="3" class="w-full bg-black/30 rounded-xl p-3 text-sm outline-none border border-white/10 focus:border-amber-400/40" placeholder="寫低你原先嘅諗法…"></textarea></div>
+    <div class="glass rounded-2xl p-5 mb-4">
+      <label class="text-xs gold block mb-2">連結後 · 浮現嘅一切</label>
+      <textarea id="after" rows="3" class="w-full bg-black/30 rounded-xl p-3 text-sm outline-none border border-white/10 focus:border-amber-400/40" placeholder="畫面、文字、感受、身體反應…"></textarea></div>
+    <div class="glass rounded-2xl p-5 mb-4">
+      <div class="text-xs gold mb-2">來源標籤</div>
+      <div class="flex flex-wrap gap-2" id="tagBox"></div></div>
+    <button onclick="saveEntry()" class="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500/30 to-amber-400/10 border border-amber-400/40 gold btn">儲存記錄</button>
+    <div class="mt-6"><div class="text-xs gold mb-3">歷史記錄</div><div id="entryList" class="space-y-2"></div></div>
+    <button onclick="go('home')" class="mt-6 text-xs text-white/40 hover:text-amber-200 btn">← 返回</button>
+  </section>
+</main>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/80 px-4">
+  <div class="glass rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg gold">Angel 設定</h3>
+      <button onclick="closeSettings()" class="text-white/40 btn">✕</button></div>
+    <div class="space-y-3 mb-6">
+      <label class="flex items-start gap-3 p-3 rounded-xl border border-amber-400/30 cursor-pointer hover:border-amber-400/40 transition bg-amber-400/5">
+        <input type="radio" name="chatMode" value="D" checked onchange="setChatMode('D')" class="mt-1 accent-amber-400">
+        <div><div class="text-sm gold">D · Puter 免費 AI（推薦）</div><div class="text-[10px] text-white/40">真 AI · 免費無限 · 無需 API Key</div></div></label>
+      <label class="flex items-start gap-3 p-3 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400/40 transition">
+        <input type="radio" name="chatMode" value="C" onchange="setChatMode('C')" class="mt-1 accent-amber-400">
+        <div><div class="text-sm gold">C · 規則引擎（離線）</div><div class="text-[10px] text-white/40">離線可用 · 零成本</div></div></label>
+      <label class="flex items-start gap-3 p-3 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400/40 transition">
+        <input type="radio" name="chatMode" value="A" onchange="setChatMode('A')" class="mt-1 accent-amber-400">
+        <div><div class="text-sm gold">A · 自備 API Key</div><div class="text-[10px] text-white/40">真 AI · 你嘅 DeepSeek 額度</div></div></label>
+      <label class="flex items-start gap-3 p-3 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400/40 transition">
+        <input type="radio" name="chatMode" value="B" onchange="setChatMode('B')" class="mt-1 accent-amber-400">
+        <div><div class="text-sm gold">B · 代理後端</div><div class="text-[10px] text-white/40">真 AI · Cloudflare Worker</div></div></label></div>
+    <div id="settingsA" class="hidden mb-4">
+      <label class="text-xs gold block mb-2">DeepSeek API Key</label>
+      <input id="apiKeyInput" type="password" placeholder="sk-..." class="w-full bg-black/30 rounded-xl px-4 py-3 text-sm outline-none border border-white/10 focus:border-amber-400/40 mb-2">
+      <div class="flex gap-2 mb-2">
+        <button onclick="saveApiKey()" class="flex-1 py-2 rounded-lg bg-amber-500/20 border border-amber-400/40 text-amber-200 text-xs btn">儲存</button>
+        <button onclick="clearApiKey()" class="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-white/40 text-xs btn">清除</button></div></div>
+    <div id="settingsB" class="hidden mb-4">
+      <label class="text-xs gold block mb-2">Worker 代理 URL</label>
+      <input id="proxyUrlInput" type="text" placeholder="https://your-worker.workers.dev" class="w-full bg-black/30 rounded-xl px-4 py-3 text-sm outline-none border border-white/10 focus:border-amber-400/40 mb-2">
+      <button onclick="saveProxyUrl()" class="w-full py-2 rounded-lg bg-amber-500/20 border border-amber-400/40 text-amber-200 text-xs btn">儲存</button></div>
+    <div class="border-t border-white/10 pt-4">
+      <div class="text-xs gold mb-3">語音引擎</div>
+      <div class="flex gap-2 mb-3">
+        <select id="voiceSelect" class="flex-1 bg-black/30 rounded-xl px-4 py-3 text-sm outline-none border border-white/10 focus:border-amber-400/40" onchange="saveVoice()">
+          <option value="default">瀏覽器默認</option>
+          <option value="zh-HK-HiuGaaiNeural">粵語 · 曉佳（溫柔）</option>
+          <option value="zh-HK-HiuMaanNeural">粵語 · 曉曼（平和）</option>
+          <option value="zh-CN-XiaoxiaoNeural">普通話 · 曉曉（親切）</option>
+          <option value="zh-CN-XiaoyouNeural">普通話 · 曉悠（冥想專用）</option>
+          <option value="en-US-AriaNeural">英語 · Aria（溫暖）</option>
+          <option value="en-US-JennyNeural">英語 · Jenny（友善）</option>
+        </select>
+        <button onclick="testVoice()" class="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-xs text-white/60 btn hover:border-amber-400/40">🔊 試聽</button>
+      </div>
+      <div class="text-xs gold mb-2">語速</div>
+      <input id="rateSlider" type="range" min="50" max="100" value="75" class="w-full accent-amber-400 mb-2" oninput="saveRate(this.value)">
+      <div class="text-[10px] text-white/40 mb-3">當前：<span id="rateLabel">0.75</span></div>
+      <label class="flex items-center gap-2 text-xs text-white/60 mb-2"><input type="checkbox" id="thinkingToggle" class="accent-amber-400" onchange="saveSettings()"> 深度思考模式</label>
+      <label class="flex items-center gap-2 text-xs text-white/60 mb-4"><input type="checkbox" id="persistChatToggle" class="accent-amber-400" onchange="saveSettings()" checked> 記住對話歷史</label>
+      <button onclick="saveAllSettings()" class="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500/40 to-amber-400/10 border border-amber-400/50 gold btn text-sm font-medium mb-2">💾 儲存並關閉</button>
+      <button onclick="resetSettings()" class="w-full py-2 rounded-xl bg-white/5 border border-white/10 text-white/40 text-xs btn">重置為默認</button>
+    </div>
+  </div>
+</div>
+
+<!-- CRISIS -->
+<div id="crisis" class="fixed inset-0 z-[80] hidden items-center justify-center bg-black/90 px-6">
+  <div class="glass rounded-2xl p-6 max-w-sm text-center">
+    <div class="text-2xl mb-3">🕊️</div>
+    <p class="text-sm text-white/80 mb-4">我聽到你嘅痛苦。你唔需要一個人面對。</p>
+    <div class="text-xs text-amber-200 space-y-1 mb-4">
+      <div>撒瑪利亞防止自殺會 2389 2222</div>
+      <div>生命熱線 2382 0000</div>
+      <div>精神健康專線 2466 7350</div></div>
+    <button onclick="document.getElementById('crisis').classList.add('hidden')" class="text-xs text-white/50 btn">關閉</button></div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCf4m7l-c7bESHQZB0JatkxoJy4x-cNZc4",
+    authDomain: "angel-sanctuary-a78d3.firebaseapp.com",
+    projectId: "angel-sanctuary-a78d3",
+    storageBucket: "angel-sanctuary-a78d3.firebasestorage.app",
+    messagingSenderId: "838231609044",
+    appId: "1:838231609044:web:6dd9ffb849b883aaacf541",
+    measurementId: "G-TR6N2F7MKE"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window._fbAuth = auth;
+  window._fbDb = db;
+  window._fbFns = { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, collection, addDoc, getDocs, query, orderBy, serverTimestamp };
+  window.dispatchEvent(new Event('fb-ready'));
+</script>
+
+<script>
+/* ===== 管理員 UID ===== */
+const ADMIN_UIDS = ['YlfaFH17qtQmOUBjnauQBp23XXG3'];
+
+/* ===== 歡迎畫面 + 背景音樂 ===== */
+let musicPlaying = false;
+function enterSanctuary() {
+  const welcome = document.getElementById('welcomeScreen');
+  welcome.classList.add('hidden');
+  
+  const music = document.getElementById('bgMusic');
+  music.volume = 0.3;
+  music.play().then(() => {
+    musicPlaying = true;
+    document.getElementById('musicToggle').textContent = '🔊';
+  }).catch(err => {
+    console.log('背景音樂播放失敗（可能係瀏覽器限制或檔案不存在）:', err);
+    musicPlaying = false;
+    document.getElementById('musicToggle').textContent = '🔇';
+  });
+}
+
+function toggleMusic() {
+  const music = document.getElementById('bgMusic');
+  if (musicPlaying) {
+    music.pause();
+    musicPlaying = false;
+    document.getElementById('musicToggle').textContent = '🔇';
+  } else {
+    music.play().then(() => {
+      musicPlaying = true;
+      document.getElementById('musicToggle').textContent = '🔊';
+    }).catch(err => {
+      console.log('背景音樂播放失敗:', err);
+    });
+  }
+}
+
+/* ===== NAV ===== */
+const views=['home','lang','angel','hypno','samadhi','deep','reiki','amitabha','audio','chakra','journal'];
+function go(id){
+  views.forEach(v=>{ const el=document.getElementById('view-'+v); if(el) el.classList.add('hidden'); });
+  const el=document.getElementById('view-'+id);
+  el.classList.remove('hidden'); el.classList.remove('fade'); void el.offsetWidth; el.classList.add('fade');
+  if(id==='audio') renderAudioLists();
+  if(id==='chakra') renderChakra();
+  if(id==='journal') renderEntries();
+  if(id==='angel') renderChat();
+}
+
+/* ===== FIREBASE AUTH ===== */
+let currentUser = null;
+
+window.addEventListener('fb-ready', () => {
+  const { onAuthStateChanged } = window._fbFns;
+  onAuthStateChanged(window._fbAuth, async (user) => {
+    currentUser = user;
+    updateAuthUI(user);
+    if (user) { await syncFromCloud(); }
+    else { document.getElementById('syncStatus').textContent = '本地模式 · 登入後自動雲端同步'; }
+  });
+});
+
+function updateAuthUI(user){
+  const authBtn = document.getElementById('unifiedAuthBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const nameEl = document.getElementById('userName');
+  const avatarEl = document.getElementById('userAvatar');
+  const adminBadge = document.getElementById('adminBadge');
+  if(user){
+    authBtn.classList.add('hidden');
+    logoutBtn.classList.remove('hidden');
+    nameEl.textContent = user.displayName || user.email || '';
+    if(user.photoURL){ avatarEl.src = user.photoURL; avatarEl.classList.remove('hidden'); }
+    if(ADMIN_UIDS.includes(user.uid)){ adminBadge.classList.remove('hidden'); }
+    else { adminBadge.classList.add('hidden'); }
+  } else {
+    authBtn.classList.remove('hidden');
+    authBtn.textContent = '登入';
+    logoutBtn.classList.add('hidden');
+    nameEl.textContent = '';
+    avatarEl.classList.add('hidden');
+    adminBadge.classList.add('hidden');
+  }
+}
+
+/* ===== 合併登入邏輯 ===== */
+async function handleUnifiedAuth() {
+  if (window._fbAuth) {
+    try {
+      const { signInWithPopup, GoogleAuthProvider } = window._fbFns;
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(window._fbAuth, provider);
+      await checkPuterAuth();
+      return;
+    } catch (err) {
+      console.log('Firebase 登入失敗，嘗試 Puter 登入:', err);
+    }
+  }
+  await handlePuterLogin();
+}
+
+async function handlePuterLogin() {
+  try {
+    const user = await puter.auth.signIn();
+    alert('Puter 登入成功！你而家可以用免費 AI 功能了。');
+    document.getElementById('unifiedAuthBtn').textContent = '已登入';
+  } catch (error) {
+    console.error('Puter 登入失敗:', error);
+    alert('登入失敗，請再試一次。');
+  }
+}
+
+async function checkPuterAuth() {
+  try {
+    if (await puter.auth.isSignedIn()) {
+      document.getElementById('unifiedAuthBtn').textContent = '已登入';
+    }
+  } catch (e) {
+    console.log('Puter 檢查失敗', e);
+  }
+}
+
+async function handleLogout(){
+  const { signOut } = window._fbFns;
+  await signOut(window._fbAuth);
+  if (typeof puter !== 'undefined' && puter.auth) {
+    try { await puter.auth.signOut(); } catch(e) {}
+  }
+}
+
+async function syncToCloud(colName, data){
+  if(!currentUser) return;
+  const { collection, addDoc, serverTimestamp } = window._fbFns;
+  try { await addDoc(collection(window._fbDb, 'users', currentUser.uid, colName), { ...data, createdAt: serverTimestamp() }); }
+  catch(err){ console.error('雲端同步失敗：', err); }
+}
+
+async function syncFromCloud(){
+  if(!currentUser) return;
+  document.getElementById('syncStatus').textContent = '☁️ 已登入 · 雲端同步中…';
+  const { collection, getDocs, query, orderBy } = window._fbFns;
+  try {
+    const q = query(collection(window._fbDb, 'users', currentUser.uid, 'entries'), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    const cloudEntries = [];
+    snap.forEach(d => cloudEntries.push({ id: d.id, ...d.data() }));
+    let localEntries = [];
+    try { localEntries = JSON.parse(localStorage.getItem('entries') || '[]'); } catch(e){}
+    const merged = [...cloudEntries.map(e => ({ id: e.id, before: e.before||'', after: e.after||'', tags: e.tags||[], time: e.time||'' })), ...localEntries];
+    const seen = new Set();
+    const unique = merged.filter(e => { const key = e.id || e.time; if(seen.has(key)) return false; seen.add(key); return true; });
+    localStorage.setItem('entries', JSON.stringify(unique.slice(0, 200)));
+    if(!document.getElementById('view-journal').classList.contains('hidden')) renderEntries();
+    document.getElementById('syncStatus').textContent = '☁️ 已登入 · 雲端同步完成';
+  } catch(err){
+    document.getElementById('syncStatus').textContent = '⚠️ 讀取雲端失敗（首次可能需要建立索引）';
+  }
+}
+
+/* ===== TTS ===== */
+let lang = localStorage.getItem('lang') || 'zh-HK';
+let voicePref = localStorage.getItem('voicePref') || 'default';
+let ratePref = parseFloat(localStorage.getItem('ratePref') || '0.75');
+
+function setLang(l){ lang=l; localStorage.setItem('lang',l); go('hypno'); resetHypno(); }
+function saveVoice(){ voicePref = document.getElementById('voiceSelect').value; localStorage.setItem('voicePref', voicePref); }
+function saveRate(v){ ratePref = v/100; document.getElementById('rateLabel').textContent = ratePref.toFixed(2); localStorage.setItem('ratePref', ratePref); }
+
+function speakText(text, onEnd){
+  if(!('speechSynthesis' in window)){ if(onEnd) setTimeout(onEnd, 8000); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  u.rate = ratePref; u.pitch = 0.9; u.volume = 1;
+  const vs = speechSynthesis.getVoices();
+  let match;
+  if(voicePref !== 'default'){
+    match = vs.find(v => v.name.includes(voicePref.split('-').pop().replace('Neural','')));
+    if(!match) match = vs.find(v => v.lang === lang);
+    if(!match) match = vs.find(v => v.lang.startsWith(lang.split('-')[0]));
+  } else {
+    match = vs.find(v => v.lang === lang) || vs.find(v => v.lang.startsWith(lang.split('-')[0]));
+  }
+  if(match) u.voice = match;
+  if(onEnd) u.onend = onEnd;
+  speechSynthesis.speak(u);
+}
+
+function testVoice() {
+  const testText = lang === 'zh-HK' ? '你好，我係天使聖所嘅語音引導。' :
+                   lang === 'zh-CN' ? '你好，我是天使圣所的语音引导。' :
+                   'Hello, I am the voice guide of Angel Sanctuary.';
+  speakText(testText);
+}
+
+/* ===== 催眠引導 ===== */
+const SCRIPTS={
+  'zh-HK':[
+    {phase:'放鬆',text:'歡迎嚟到呢個神聖空間。請你搵一個舒服嘅位置坐低或者躺低，閉上眼睛。深吸一口氣，慢慢呼出。感覺你嘅身體開始沉入地面，好似被大地溫柔咁承托住。你係安全嘅，你係被支持嘅。'},
+    {phase:'神聖空間',text:'而家，想像你面前有一道柔和嘅光。呢道光代表你內心嘅神聖空間。當你行入去，你會見到一個專屬於你嘅地方。可能係一座教堂，一個禪堂，或者一片星空下嘅草地。喺呢度，你能夠完全做自己。'},
+    {phase:'能量啟動',text:'喺呢個空間入面，想像一道純淨嘅光芒由頭頂流入你嘅全身。呢道光正在喚醒你內心嘅智慧。你唔需要急，你只需要停留，聆聽。真正嘅答案，會由你自己內心浮現。'}
+  ],
+  'zh-CN':[
+    {phase:'放松',text:'欢迎来到这个神圣空间。请你找一个舒服的位置坐下或躺下，闭上眼睛。深吸一口气，慢慢呼出。感觉你的身体开始沉入地面，好像被大地温柔地承托着。你是安全的，你是被支持的。'},
+    {phase:'神圣空间',text:'现在，想象你面前有一道柔和的光。这道光代表你内心的神圣空间。当你走进去，你会见到一个专属于你的地方。可能是一座教堂，一个禅堂，或者一片星空下的草地。在这里，你能够完全做自己。'},
+    {phase:'能量启动',text:'在这个空间里，想象一道纯净的光芒从头顶流入你的全身。这道光正在唤醒你内心的智慧。你不需要急，你只需要停留，聆听。真正的答案，会由你自己内心浮现。'}
+  ],
+  'en-US':[
+    {phase:'Relax',text:'Welcome to this sacred space. Find a comfortable position, sitting or lying down, and close your eyes. Take a deep breath in, and slowly let it out. Feel your body sinking into the ground, gently held by the earth. You are safe. You are supported.'},
+    {phase:'Sacred Space',text:'Now, imagine a soft light before you. This light represents your inner sanctuary. As you step in, you find a place that belongs only to you. It may be a chapel, a meditation hall, or a meadow under the stars. Here, you can fully be yourself.'},
+    {phase:'Activation',text:'Within this space, imagine a pure light flowing from the crown of your head into your whole body. This light is awakening the wisdom within you. There is no rush. Simply stay, and listen. The true answer will arise from within you.'}
+  ]
+};
+
+let playing=false, idx=0;
+function resetHypno(){
+  playing=false; idx=0;
+  document.getElementById('hypnoText').textContent='';
+  document.getElementById('btnPlay').textContent='▶';
+  document.getElementById('phaseLabel').textContent='準備';
+  document.getElementById('progLabel').textContent='0 / 3';
+  document.getElementById('progBar').style.width='0%';
+  if(window.speechSynthesis) speechSynthesis.cancel();
+}
+function togglePlay(){ playing?stopPlay():startPlay(); }
+function stopPlay(){ playing=false; document.getElementById('btnPlay').textContent='▶'; if(window.speechSynthesis) speechSynthesis.cancel(); }
+function startPlay(){ playing=true; document.getElementById('btnPlay').textContent='❚❚'; if(idx>=SCRIPTS[lang].length) idx=0; speakLine(); }
+function speakLine(){
+  if(!playing) return;
+  const lines=SCRIPTS[lang];
+  if(idx>=lines.length){
+    playing=false; document.getElementById('btnPlay').textContent='▶';
+    document.getElementById('phaseLabel').textContent='完成';
+    document.getElementById('progBar').style.width='100%';
+    return;
+  }
+  const line=lines[idx];
+  document.getElementById('phaseLabel').textContent=line.phase;
+  document.getElementById('progLabel').textContent=(idx+1)+' / '+lines.length;
+  document.getElementById('progBar').style.width=(idx/lines.length*100)+'%';
+  const el=document.getElementById('hypnoText');
+  el.textContent=line.text;
+  speakText(line.text, ()=>{
+    el.textContent=line.text;
+    idx++;
+    document.getElementById('progBar').style.width=(idx/lines.length*100)+'%';
+    if(playing) setTimeout(speakLine,1200);
+  });
+}
+
+/* ===== 入定催眠 ===== */
+let samadhiTimer=null, samadhiFreq=432, samadhiEnd=0;
+function setSamadhiFreq(f){ samadhiFreq=f; }
+function startSamadhi(minutes){
+  document.getElementById('samadhiPlayer').classList.remove('hidden');
+  samadhiEnd = Date.now() + minutes*60*1000;
+  if(samadhiFreq) playFreq(samadhiFreq, '入定');
+  const phases = ['身體放鬆','呼吸安定','念頭放下','深層靜默','溫和出定'];
+  const total = minutes*60;
+  const phaseDurations = [0.2, 0.15, 0.15, 0.4, 0.1].map(p => p*total);
+  let elapsed = 0;
+  const script = lang==='zh-HK' ? [
+    '請你閉上眼睛，由頭頂開始，慢慢放鬆全身。',
+    '唔需要控制呼吸，只需要觀察氣息出入。',
+    '念頭嚟嘅時候，唔需要趕走佢，只需要睇住佢離開。',
+    '而家進入深層靜默。保持覺知。',
+    '慢慢感受身體，深呼吸，準備返嚟。'
+  ] : lang==='zh-CN' ? [
+    '请你闭上眼睛，从头顶开始，慢慢放松全身。',
+    '不需要控制呼吸，只需要观察气息出入。',
+    '念头来的时候，不需要赶走它，只需要看着它离开。',
+    '现在进入深层静默。保持觉知。',
+    '慢慢感受身体，深呼吸，准备回来。'
+  ] : [
+    'Close your eyes. From the crown of your head, slowly relax your whole body.',
+    'No need to control your breath. Simply observe the inflow and outflow.',
+    'When thoughts arise, do not push them away. Just watch them leave.',
+    'Now enter deep silence. Stay aware.',
+    'Slowly feel your body. Take a deep breath. Prepare to return.'
+  ];
+  let lastPhase = -1;
+  speakText(script[0]);
+  samadhiTimer = setInterval(()=>{
+    elapsed += 1;
+    const remain = Math.max(0, Math.floor((samadhiEnd - Date.now())/1000));
+    const m = String(Math.floor(remain/60)).padStart(2,'0');
+    const s = String(remain%60).padStart(2,'0');
+    document.getElementById('samadhiTime').textContent = m+':'+s;
+    let acc = 0, phaseIdx = 0;
+    for(let i=0;i<phaseDurations.length;i++){
+      acc += phaseDurations[i];
+      if(elapsed <= acc){ phaseIdx = i; break; }
+    }
+    document.getElementById('samadhiPhase').textContent = phases[phaseIdx];
+    if(phaseIdx !== lastPhase && script[phaseIdx] && phaseIdx > 0){
+      lastPhase = phaseIdx;
+      speakText(script[phaseIdx]);
+    }
+    if(remain <= 0){ stopSamadhi(); }
+  }, 1000);
+}
+function stopSamadhi(){
+  if(samadhiTimer) clearInterval(samadhiTimer);
+  samadhiTimer = null;
+  clearAudio();
+  if(window.speechSynthesis) speechSynthesis.cancel();
+  document.getElementById('samadhiPlayer').classList.add('hidden');
+}
+
+/* ===== 深度催眠 ===== */
+let deepTimer=null, deepEnd=0;
+function startDeep(minutes){
+  document.getElementById('deepPlayer').classList.remove('hidden');
+  deepEnd = Date.now() + minutes*60*1000;
+  playFreq(963, '深度催眠');
+  const phases = ['準備保護','身體放鬆','下降樓梯','神聖空間','深度靜默','溫和返回'];
+  const script = lang==='zh-HK' ? [
+    '請你搵一個安全、舒適嘅位置。閉上眼睛。深吸一口氣，慢慢呼出。你係安全嘅。你係被支持嘅。',
+    '將注意力放喺你嘅頭頂。感覺你嘅頭皮慢慢放鬆。將呢份放鬆帶到額頭、眼睛、面部、下顎。',
+    '而家，想像你面前有一道樓梯，向下延伸。我哋會一齊慢慢落去。十……九……八……每一級，你會進入更深層嘅放鬆。',
+    '你已經到達底部。而家，你身處一個神聖嘅空間。喺呢度，你可以停留。你可以聆聽。你可以問任何你想問嘅問題。',
+    '而家，我會停止講話。你只需要停留喺呢個空間。保持覺知。你係安全嘅。答案會由你自己內心浮現。',
+    '慢慢咁，將注意力帶返你嘅身體。感受你嘅呼吸。當你準備好，我哋會一齊由一數到五。一……二……三……四……五。張開眼睛。'
+  ] : lang==='zh-CN' ? [
+    '请你找一个安全、舒适的位置。闭上眼睛。深吸一口气，慢慢呼出。你是安全的。你是被支持的。',
+    '将注意力放在你的头顶。感觉你的头皮慢慢放松。将这份放松带到额头、眼睛、面部、下颚。',
+    '现在，想象你面前有一道楼梯，向下延伸。我们会一起慢慢下去。十……九……八……每一级，你会进入更深层的放松。',
+    '你已经到达底部。现在，你身处一个神圣的空间。在这里，你可以停留。你可以聆听。你可以问任何你想问的问题。',
+    '现在，我会停止讲话。你只需要停留在这个空间。保持觉知。你是安全的。答案会由你自己内心浮现。',
+    '慢慢地，将注意力带回你的身体。感受你的呼吸。当你准备好，我们会一起由一数到五。一……二……三……四……五。张开眼睛。'
+  ] : [
+    'Find a safe, comfortable position. Close your eyes. Take a deep breath in, and slowly let it out. You are safe. You are supported.',
+    'Bring your attention to the crown of your head. Feel your scalp slowly relax. Carry this relaxation to your forehead, eyes, face, jaw.',
+    'Now, imagine a staircase before you, descending downward. We will go down together. Ten... nine... eight... with each step, you go deeper.',
+    'You have reached the bottom. Now, you are in a sacred space. Here, you may stay. You may listen. You may ask any question you wish.',
+    'Now, I will stop speaking. Simply stay in this space. Stay aware. You are safe. The answer will arise from within you.',
+    'Slowly, bring your attention back to your body. Feel your breath. When you are ready, we will count from one to five. One... two... three... four... five. Open your eyes.'
+  ];
+  const total = minutes*60;
+  const phaseDurations = [0.08, 0.17, 0.13, 0.12, 0.35, 0.15].map(p => p*total);
+  let elapsed = 0;
+  let lastPhase = -1;
+  speakText(script[0]);
+  deepTimer = setInterval(()=>{
+    elapsed += 1;
+    const remain = Math.max(0, Math.floor((deepEnd - Date.now())/1000));
+    const m = String(Math.floor(remain/60)).padStart(2,'0');
+    const s = String(remain%60).padStart(2,'0');
+    document.getElementById('deepTime').textContent = m+':'+s;
+    let acc = 0, phaseIdx = 0;
+    for(let i=0;i<phaseDurations.length;i++){
+      acc += phaseDurations[i];
+      if(elapsed <= acc){ phaseIdx = i; break; }
+    }
+    document.getElementById('deepPhase').textContent = phases[phaseIdx];
+    if(phaseIdx !== lastPhase && script[phaseIdx] && phaseIdx > 0){
+      lastPhase = phaseIdx;
+      speakText(script[phaseIdx]);
+    }
+    if(remain <= 0){ stopDeep(); }
+  }, 1000);
+}
+function stopDeep(){
+  if(deepTimer) clearInterval(deepTimer);
+  deepTimer = null;
+  clearAudio();
+  if(window.speechSynthesis) speechSynthesis.cancel();
+  document.getElementById('deepPlayer').classList.add('hidden');
+}
+
+/* ===== 靈氣療癒 ===== */
+function reikiMode(m){
+  document.getElementById('reikiSelf').classList.toggle('hidden', m!=='self');
+  document.getElementById('reikiRemote').classList.toggle('hidden', m!=='remote');
+}
+
+const REIKI_HANDS = [
+  {name:'頂輪', desc:'頭頂 · 3 分鐘', emoji:'🙌'},
+  {name:'眉心輪', desc:'額頭 · 3 分鐘', emoji:'🙌'},
+  {name:'太陽穴', desc:'頭兩側 · 2 分鐘', emoji:'🤲'},
+  {name:'後腦', desc:'後腦勺 · 3 分鐘', emoji:'🤲'},
+  {name:'喉輪', desc:'喉嚨 · 2 分鐘', emoji:'🙌'},
+  {name:'心輪', desc:'胸口 · 5 分鐘', emoji:'🤲'},
+  {name:'太陽神經叢', desc:'胃部 · 3 分鐘', emoji:'🙌'},
+  {name:'臍輪', desc:'肚臍 · 3 分鐘', emoji:'🤲'},
+  {name:'海底輪', desc:'尾椎 · 3 分鐘', emoji:'🙌'},
+  {name:'肩膀', desc:'兩肩 · 2 分鐘', emoji:'🤲'},
+  {name:'膝蓋', desc:'兩膝 · 2 分鐘', emoji:'🤲'},
+  {name:'腳底', desc:'腳掌 · 3 分鐘', emoji:'🦶'}
+];
+
+let reikiHandIdx=0, reikiHandTimer=null, reikiSelfRunning=false;
+function startReikiSelf(minutes){
+  document.getElementById('reikiSelfPlayer').classList.remove('hidden');
+  reikiHandIdx = 0; reikiSelfRunning = true;
+  showReikiHand();
+}
+function showReikiHand(){
+  if(!reikiSelfRunning) return;
+  const h = REIKI_HANDS[reikiHandIdx];
+  document.getElementById('reikiHandName').textContent = h.name;
+  document.getElementById('reikiHandDesc').textContent = h.desc;
+  document.getElementById('reikiHandEmoji').textContent = h.emoji;
+  const min = parseInt(h.desc.match(/(\d+)/)[1]);
+  let remain = min*60;
+  speakText(lang==='zh-HK' ? '而家將手放喺'+h.name+'。' : lang==='zh-CN' ? '现在将手放在'+h.name+'。' : 'Now place your hands on '+h.name+'.');
+  clearInterval(reikiHandTimer);
+  reikiHandTimer = setInterval(()=>{
+    remain--;
+    const m = String(Math.floor(remain/60)).padStart(2,'0');
+    const s = String(remain%60).padStart(2,'0');
+    document.getElementById('reikiSelfTime').textContent = m+':'+s;
+    if(remain <= 0){
+      clearInterval(reikiHandTimer);
+      reikiHandIdx++;
+      if(reikiHandIdx >= REIKI_HANDS.length){ stopReikiSelf(); }
+      else { showReikiHand(); }
+    }
+  }, 1000);
+}
+function stopReikiSelf(){
+  reikiSelfRunning = false;
+  clearInterval(reikiHandTimer);
+  if(window.speechSynthesis) speechSynthesis.cancel();
+  document.getElementById('reikiSelfPlayer').classList.add('hidden');
+}
+
+let reikiRemoteTimer=null;
+function startReikiRemote(minutes){
+  document.getElementById('reikiRemotePlayer').classList.remove('hidden');
+  let remain = minutes*60;
+  speakText(lang==='zh-HK' ? '而家畫出距離符號，想像能量傳送到你嘅對象。' : lang==='zh-CN' ? '现在画出距离符号，想象能量传送到你的对象。' : 'Now draw the distance symbol. Imagine energy flowing to your target.');
+  reikiRemoteTimer = setInterval(()=>{
+    remain--;
+    const m = String(Math.floor(remain/60)).padStart(2,'0');
+    const s = String(remain%60).padStart(2,'0');
+    document.getElementById('reikiRemoteTime').textContent = m+':'+s;
+    if(remain <= 0){ stopReikiRemote(); }
+  }, 1000);
+}
+function stopReikiRemote(){
+  clearInterval(reikiRemoteTimer);
+  if(window.speechSynthesis) speechSynthesis.cancel();
+  document.getElementById('reikiRemotePlayer').classList.add('hidden');
+}
+
+/* ===== 彌陀願海 ===== */
+let amitabhaTimer=null, amitabhaMode='sit', amitabhaDuration=30, amitabhaChantType='四字四音';
+
+function setAmitabhaDuration(min){
+  amitabhaDuration = min;
+  document.querySelectorAll('#amitabhaDurations button').forEach(b => {
+    const v = parseInt(b.textContent);
+    if(v === min){ b.classList.add('bg-amber-400/20','border-amber-400/50','gold'); b.classList.remove('bg-white/5'); }
+    else { b.classList.remove('bg-amber-400/20','border-amber-400/50','gold'); b.classList.add('bg-white/5'); }
+  });
+}
+function setChantType(t){ amitabhaChantType = t; }
+
+function startAmitabha(mode){
+  amitabhaMode = mode;
+  document.getElementById('chantOptions').style.display = (mode === 'chant') ? 'block' : 'none';
+  document.getElementById('amitabhaPlayer').classList.remove('hidden');
+  if(mode === 'chant'){ startChant(); }
+  else if(mode === 'sit'){ startAmitabhaSit(); }
+  else if(mode === 'vows'){ startAmitabhaVows(); }
+}
+
+function startAmitabhaSit(){
+  const total = amitabhaDuration*60;
+  let remain = total;
+  document.getElementById('amitabhaPhase').textContent = '日常靜坐';
+  const steps = lang==='zh-HK' ? [
+    '坐好，閉眼，深呼吸。身體放鬆，心念沉澱。',
+    '觀察念頭來去，觀察呼吸出入，觀察身體感受。',
+    '吸氣時心中默念南無，呼氣時心中默念阿彌陀佛。',
+    '我今發願，願生西方極樂世界，願見阿彌陀佛。',
+    '願以此功德，莊嚴佛淨土，上報四重恩，下濟三途苦。',
+    '慢慢感受身體，深呼吸，張開眼睛，將安定帶入日常。'
+  ] : lang==='zh-CN' ? [
+    '坐好，闭眼，深呼吸。身体放松，心念沉淀。',
+    '观察念头来去，观察呼吸出入，观察身体感受。',
+    '吸气时心中默念南无，呼气时心中默念阿弥陀佛。',
+    '我今发愿，愿生西方极乐世界，愿见阿弥陀佛。',
+    '愿以此功德，庄严佛净土，上报四重恩，下济三途苦。',
+    '慢慢感受身体，深呼吸，张开眼睛，将安定带入日常。'
+  ] : [
+    'Sit, close your eyes, breathe deeply. Relax your body, settle your mind.',
+    'Observe thoughts coming and going, observe the breath, observe bodily sensations.',
+    'Inhale silently "Namo", exhale silently "Amitabha".',
+    'I vow to be born in the Western Pure Land, to see Amitabha.',
+    'May this merit adorn the Buddha Pure Land, repay the fourfold grace, relieve suffering in the three paths.',
+    'Slowly feel your body, breathe deeply, open your eyes, carry this calm into daily life.'
+  ];
+  const phaseDur = total / steps.length;
+  let stepIdx = 0;
+  speakText(steps[0]);
+  amitabhaTimer = setInterval(()=>{
+    remain--;
+    const m = String(Math.floor(remain/60)).padStart(2,'0');
+    const s = String(remain%60).padStart(2,'0');
+    document.getElementById('amitabhaTime').textContent = m+':'+s;
+    const newIdx = Math.min(Math.floor((total - remain) / phaseDur), steps.length - 1);
+    if(newIdx !== stepIdx){ stepIdx = newIdx; speakText(steps[stepIdx]); }
+    document.getElementById('amitabhaVerse').textContent = steps[stepIdx];
+    if(remain <= 0){ stopAmitabha(); }
+  }, 1000);
+}
+
+const VOWS_48 = [
+  {n:1, text:'設我得佛，國有地獄餓鬼畜生者，不取正覺。', plain:'如果我嘅國土裡面，仲有地獄、餓鬼、畜生呢三種痛苦嘅眾生，我就唔成佛。'},
+  {n:2, text:'設我得佛，國中天人壽終之後，復更三惡道者，不取正覺。', plain:'國中天人壽終之後，唔會再墮入三惡道。'},
+  {n:3, text:'設我得佛，國中天人，不悉真金色者，不取正覺。', plain:'國中眾生都具足真金色身。'},
+  {n:4, text:'設我得佛，國中天人，形色不同，有好醜者，不取正覺。', plain:'容貌端正如一，冇美醜差別。'},
+  {n:5, text:'設我得佛，國中天人，不識宿命，下至知百千億那由他諸劫事者，不取正覺。', plain:'都能知道自己過去無量劫嘅善惡因果。'},
+  {n:6, text:'設我得佛，國中天人，不得天眼，下至見百千億那由他諸佛國者，不取正覺。', plain:'都能洞視十方世界過去、現在、未來之事。'},
+  {n:7, text:'設我得佛，國中天人，不得天耳，下至聞百千億那由他諸佛所說法者，不取正覺。', plain:'都能徹聽十方諸佛所說之法。'},
+  {n:8, text:'設我得佛，國中天人，不得見他心智，下至知百千億那由他諸佛國中眾生心念者，不取正覺。', plain:'都能知道無量諸佛剎中一切眾生嘅心念。'},
+  {n:9, text:'設我得佛，國中天人，不得神足，於一念頃，下至不能超過百千億那由他諸佛國者，不取正覺。', plain:'一剎那間就能遍遊十方國土，供養諸佛。'},
+  {n:10, text:'設我得佛，國中天人，若起想念貪計身者，不取正覺。', plain:'遠離一切分別心，六根清淨。'},
+  {n:11, text:'設我得佛，國中天人，不住定聚，必至滅度者，不取正覺。', plain:'安住正定，必定成佛。'},
+  {n:12, text:'設我得佛，光明有限量，下至不照百千億那由他諸佛國者，不取正覺。', plain:'光明不可限量，普照十方，勝過日月千萬億倍。'},
+  {n:13, text:'設我得佛，壽命有限量，下至百千億那由他劫者，不取正覺。', plain:'壽命無量，國中天人壽命亦同。'},
+  {n:14, text:'設我得佛，國中聲聞，有能計量，乃至三千大千世界眾生，悉成緣覺，於百千劫，悉共計校，知其數者，不取正覺。', plain:'聲聞聖眾數量無量無邊，無法計算。'},
+  {n:15, text:'設我得佛，國中天人，壽命無能限量，除其本願，修短自在。若不爾者，不取正覺。', plain:'壽命長短隨意自在。'},
+  {n:16, text:'設我得佛，國中天人，乃至聞有不善名者，不取正覺。', plain:'國中聽唔到任何不善之名。'},
+  {n:17, text:'設我得佛，十方世界無量諸佛，不悉咨嗟稱我名者，不取正覺。', plain:'十方諸佛都稱歎我嘅名號同國土功德。'},
+  {n:18, text:'設我得佛，十方眾生，至心信樂，欲生我國，乃至十念，若不生者，不取正覺。唯除五逆，誹謗正法。', plain:'十方眾生至心信樂，乃至十念，必定往生。'},
+  {n:19, text:'設我得佛，十方眾生，發菩提心，修諸功德，至心發願，欲生我國，臨壽終時，假令不與大眾圍繞現其人前者，不取正覺。', plain:'臨終時我與諸菩薩眾現前接引。'},
+  {n:20, text:'設我得佛，十方眾生，聞我名號，繫念我國，植眾德本，至心迴向，欲生我國，不果遂者，不取正覺。', plain:'繫念我國，植眾德本，至心迴向，必定滿願。'},
+  {n:21, text:'設我得佛，國中天人，不悉成滿三十二大人相者，不取正覺。', plain:'國中天人都具足三十二種大丈夫相。'},
+  {n:22, text:'設我得佛，他方佛土諸菩薩眾，來生我國，究竟必至一生補處。', plain:'他方菩薩來生我國，究竟必至一生補處。'},
+  {n:23, text:'設我得佛，國中菩薩，承佛神力，供養諸佛，一食之頃，不能遍至無量無數億那由他諸佛國者，不取正覺。', plain:'一剎那間供養十方無量諸佛。'},
+  {n:24, text:'設我得佛，國中菩薩，在諸佛前，現其德本，諸所求欲供養之具，若不如意者，不取正覺。', plain:'供養諸佛嘅供具隨心所欲，自然現前。'},
+  {n:25, text:'設我得佛，國中菩薩，不能演說一切智者，不取正覺。', plain:'都能演說一切智嘅妙法。'},
+  {n:26, text:'設我得佛，國中菩薩，不得金剛那羅延身者，不取正覺。', plain:'身體堅固如那羅延金剛力士。'},
+  {n:27, text:'設我得佛，國中天人，一切萬物，嚴淨光麗，形色殊特，窮微極妙，無能稱量。', plain:'國土萬物嚴淨，無量莊嚴。'},
+  {n:28, text:'設我得佛，國中菩薩，乃至少功德者，不能知見其道場樹無量光色，高四百萬里者，不取正覺。', plain:'菩提道樹高顯，眾生見者得法益。'},
+  {n:29, text:'設我得佛，國中菩薩，若受讀經法，諷誦持說，而不得辯才智慧者，不取正覺。', plain:'誦讀經典都能得到智慧。'},
+  {n:30, text:'設我得佛，國中菩薩，智慧辯才，若可限量者，不取正覺。', plain:'智慧辯才無有限量。'},
+  {n:31, text:'設我得佛，國土清淨，皆悉照見十方一切無量無數不可思議諸佛世界，猶如明鏡，睹其面像。', plain:'國土清淨如鏡，照見十方諸佛世界。'},
+  {n:32, text:'設我得佛，自地以上，至于虛空，宮殿樓觀，池流華樹，國土所有一切萬物，皆以無量雜寶百千種香而共合成。', plain:'以無量寶香莊嚴國土。'},
+  {n:33, text:'設我得佛，十方無量不可思議諸佛世界眾生之類，蒙我光明觸其身者，身心柔軟，超過天人。', plain:'蒙我光明觸身者，身心柔軟安樂。'},
+  {n:34, text:'設我得佛，十方無量不可思議諸佛世界眾生之類，聞我名字，不得菩薩無生法忍，諸深總持者，不取正覺。', plain:'聞我名號，得無生法忍與深總持。'},
+  {n:35, text:'設我得佛，十方無量不可思議諸佛世界，其有女人，聞我名字，歡喜信樂，發菩提心，厭惡女身，壽終之後，復為女像者，不取正覺。', plain:'女人聞名發願，命終即化男子往生。'},
+  {n:36, text:'設我得佛，十方無量不可思議諸佛世界諸菩薩眾，聞我名字，壽終之後，常修梵行，至成佛道。', plain:'菩薩常修清淨梵行，直至成佛。'},
+  {n:37, text:'設我得佛，十方無量不可思議諸佛世界諸天人民，聞我名字，五體投地，稽首作禮，歡喜信樂，修菩薩行。諸天世人，莫不致敬。', plain:'所生之處，天人恭敬禮拜。'},
+  {n:38, text:'設我得佛，國中天人，欲得衣服，隨念即至，如佛所讚應法妙服，自然在身。', plain:'衣服隨念而生，自然柔軟。'},
+  {n:39, text:'設我得佛，國中天人，所受快樂，不如漏盡比丘者，不取正覺。', plain:'受樂如同漏盡比丘。'},
+  {n:40, text:'設我得佛，國中菩薩，隨意欲見十方無量嚴淨佛土，應時如願，於寶樹中，皆悉照見，猶如明鏡，睹其面像。', plain:'菩提樹中能現十方無量佛剎。'},
+  {n:41, text:'設我得佛，他方國土諸菩薩眾，聞我名字，至于得佛，諸根缺陋不具足者，不取正覺。', plain:'他方眾生聞名，諸根無缺。'},
+  {n:42, text:'設我得佛，他方國土諸菩薩眾，聞我名字，皆悉逮得清淨解脫三昧。住是三昧，一發意頃，供養無量不可思議諸佛世尊，而不失定意。', plain:'聞名皆得清淨解脫三昧。'},
+  {n:43, text:'設我得佛，他方國土諸菩薩眾，聞我名字，壽終之後，生尊貴家。', plain:'聞名者得大福德。'},
+  {n:44, text:'設我得佛，他方國土諸菩薩眾，聞我名字，歡喜踴躍，修菩薩行，具足德本。', plain:'修行具足一切德本。'},
+  {n:45, text:'設我得佛，他方國土諸菩薩眾，聞我名字，皆悉逮得普等三昧。住是三昧，至于成佛，常見無量不可思議一切諸佛。', plain:'皆得普等三昧。'},
+  {n:46, text:'設我得佛，國中菩薩，隨其志願所欲聞法，自然得聞。', plain:'隨其志願，聽聞妙法。'},
+  {n:47, text:'設我得佛，他方國土諸菩薩眾，聞我名字，不即得至不退轉者，不取正覺。', plain:'聞名者得不退轉。'},
+  {n:48, text:'設我得佛，他方國土諸菩薩眾，聞我名字，不即得至第一忍，第二第三法忍，於諸佛法，不能即得不退轉者，不取正覺。', plain:'得三種法忍（音響忍、柔順忍、無生法忍）。'}
+];
+
+function startAmitabhaVows(){
+  document.getElementById('amitabhaPhase').textContent = '四十八願領受';
+  const total = amitabhaDuration*60;
+  let remain = total;
+  let idx = 0;
+  const perVow = total / VOWS_48.length;
+  const intro = lang==='zh-HK' ? '在無量劫前，有一位國王，聽聞佛法後，捨棄王位，出家修行，名號法藏。他在佛前發下四十八大願，願願為眾生。' :
+                lang==='zh-CN' ? '在无量劫前，有一位国王，听闻佛法后，舍弃王位，出家修行，名号法藏。他在佛前发下四十八大愿，愿愿为众生。' :
+                'Ages ago, a king heard the Dharma, renounced his throne, and became the monk Dharmakara. Before the Buddha, he made forty-eight great vows, each for the sake of all beings.';
+  speakText(intro);
+  amitabhaTimer = setInterval(()=>{
+    remain--;
+    const m = String(Math.floor(remain/60)).padStart(2,'0');
+    const s = String(remain%60).padStart(2,'0');
+    document.getElementById('amitabhaTime').textContent = m+':'+s;
+    const elapsed = total - remain;
+    const newIdx = Math.min(Math.floor(elapsed / perVow), VOWS_48.length - 1);
+    if(newIdx !== idx || (elapsed < 2 && idx === 0)){
+      idx = newIdx;
+      const v = VOWS_48[idx];
+      document.getElementById('amitabhaVerse').textContent = '第'+v.n+'願：'+v.text;
+      speakText(v.text + '。' + v.plain + '。南無阿彌陀佛。');
+    }
+    if(remain <= 0){ stopAmitabha(); }
+  }, 1000);
+}
+
+function startChant(){
+  document.getElementById('amitabhaPhase').textContent = '佛號念佛 · ' + amitabhaChantType;
+  const total = amitabhaDuration*60;
+  let remain = total;
+  const chantText = amitabhaChantType === '四字四音' ? '南無·阿彌·陀佛' :
+                    amitabhaChantType === '六字二音' ? '南無阿彌陀佛' :
+                    amitabhaChantType === '金剛念誦' ? '南無阿彌陀佛' : '南無阿彌陀佛';
+  document.getElementById('amitabhaVerse').textContent = chantText;
+  if(amitabhaChantType === '默念'){
+    speakText(lang==='zh-HK' ? '在心中默念南無阿彌陀佛。' : lang==='zh-CN' ? '在心中默念南无阿弥陀佛。' : 'Silently recite Namo Amitabha.');
+  } else {
+    speakText(chantText);
+  }
+  amitabhaTimer = setInterval(()=>{
+    remain--;
+    const m = String(Math.floor(remain/60)).padStart(2,'0');
+    const s = String(remain%60).padStart(2,'0');
+    document.getElementById('amitabhaTime').textContent = m+':'+s;
+    if(remain <= 0){ stopAmitabha(); }
+  }, 1000);
+}
+
+function stopAmitabha(){
+  if(amitabhaTimer) clearInterval(amitabhaTimer);
+  amitabhaTimer = null;
+  clearAudio();
+  if(window.speechSynthesis) speechSynthesis.cancel();
+  document.getElementById('amitabhaPlayer').classList.add('hidden');
+}
+
+/* ===== AUDIO ===== */
+const FREQS=[
+  {hz:174,name:'舒緩疼痛',ch:'—'},{hz:285,name:'細胞修復',ch:'—'},
+  {hz:396,name:'釋放恐懼',ch:'海底輪'},{hz:417,name:'轉化負能量',ch:'生殖輪'},
+  {hz:432,name:'靜心平和',ch:'—'},{hz:528,name:'愛與奇蹟',ch:'心輪'},
+  {hz:639,name:'和諧人際',ch:'心輪'},{hz:741,name:'直覺清醒',ch:'喉輪'},
+  {hz:852,name:'靈性覺醒',ch:'眉心輪'},{hz:963,name:'宇宙意識',ch:'頂輪'}
+];
+const BEATS=[
+  {hz:'Delta 2Hz',desc:'深層修復'},{hz:'Theta 6Hz',desc:'深度冥想'},
+  {hz:'Alpha 10Hz',desc:'放鬆專注'},{hz:'Gamma 40Hz',desc:'覺醒洞察'}
+];
+
+let audioCtx=null, oscNodes=[], gainNode=null;
+
+function ensureCtx(){
+  if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+}
+function renderAudioLists(){
+  document.getElementById('freqList').innerHTML=FREQS.map(f=>`
+    <button onclick="playFreq(${f.hz},'${f.name}')" class="p-3 rounded-xl bg-white/5 border border-white/10 text-left btn hover:border-amber-400/40">
+      <div class="text-sm gold">${f.hz} Hz</div>
+      <div class="text-[10px] text-white/50">${f.name}</div>
+      <div class="text-[9px] text-white/30">${f.ch}</div></button>`).join('');
+  document.getElementById('beatList').innerHTML=BEATS.map(b=>`
+    <button onclick="playBeat('${b.hz}')" class="p-3 rounded-xl bg-white/5 border border-white/10 text-left btn hover:border-amber-400/40">
+      <div class="text-sm gold">${b.hz}</div>
+      <div class="text-[10px] text-white/50">${b.desc}</div></button>`).join('');
+}
+function clearAudio(){ oscNodes.forEach(o=>{try{o.stop()}catch(e){}}); oscNodes=[]; }
+function makeGain(){
+  ensureCtx();
+  if(gainNode) return gainNode;
+  gainNode=audioCtx.createGain();
+  gainNode.gain.value=document.getElementById('vol').value/100*0.4;
+  gainNode.connect(audioCtx.destination);
+  return gainNode;
+}
+function playFreq(hz,name){
+  clearAudio(); ensureCtx();
+  const g=makeGain();
+  const o=audioCtx.createOscillator();
+  o.type='sine'; o.frequency.value=hz;
+  const og=audioCtx.createGain(); og.gain.value=0.5;
+  o.connect(og); og.connect(g); o.start();
+  oscNodes.push(o);
+}
+function playBeat(label){
+  clearAudio(); ensureCtx();
+  const g=makeGain();
+  const base=200; let diff=2;
+  if(label.includes('Theta')) diff=6;
+  else if(label.includes('Alpha')) diff=10;
+  else if(label.includes('Gamma')) diff=40;
+  const L=audioCtx.createOscillator(); L.type='sine'; L.frequency.value=base;
+  const R=audioCtx.createOscillator(); R.type='sine'; R.frequency.value=base+diff;
+  if(audioCtx.createStereoPanner){
+    const pL=audioCtx.createStereoPanner(); pL.pan.value=-1; L.connect(pL); pL.connect(g);
+    const pR=audioCtx.createStereoPanner(); pR.pan.value=1; R.connect(pR); pR.connect(g);
+  } else { L.connect(g); R.connect(g); }
+  L.start(); R.start(); oscNodes.push(L,R);
+}
+function setVol(v){
+  document.getElementById('volLabel').textContent=v+'%';
+  if(gainNode) gainNode.gain.value=v/100*0.4;
+}
+function stopAudio(){ clearAudio(); }
+
+/* ===== CHAKRA ===== */
+const CHAKRAS=[
+  {id:1,name:'海底輪',color:'#e74c3c',pos:'尾椎骨',el:'土',seed:'LAM',freq:396,mudra:'根手印：拇指同食指指尖輕觸，其餘三指伸直',aff:'我係安全嘅，我扎根於大地'},
+  {id:2,name:'生殖輪',color:'#e67e22',pos:'下腹部',el:'水',seed:'VAM',freq:417,mudra:'水手印：拇指同小指指尖輕觸，其餘三指伸直',aff:'我擁抱生命嘅流動同創造力'},
+  {id:3,name:'太陽神經叢',color:'#f1c40f',pos:'胃部',el:'火',seed:'RAM',freq:528,mudra:'火手印：無名指彎曲，拇指輕壓無名指指尖',aff:'我擁有內在力量同自信'},
+  {id:4,name:'心輪',color:'#2ecc71',pos:'胸口',el:'風',seed:'YAM',freq:639,mudra:'空中手印：中指同拇指指尖輕觸，其餘三指伸直',aff:'我值得被愛，我能夠給予愛'},
+  {id:5,name:'喉輪',color:'#3498db',pos:'喉嚨',el:'乙太',seed:'HAM',freq:741,mudra:'風手印：食指彎曲，拇指輕壓食指',aff:'我能夠清晰表達自己'},
+  {id:6,name:'眉心輪',color:'#9b59b6',pos:'額頭',el:'光',seed:'OM',freq:852,mudra:'智慧手印：拇指同食指指尖輕觸，掌心向上放膝上',aff:'我信任我嘅直覺同內在智慧'},
+  {id:7,name:'頂輪',color:'#ecf0f1',pos:'頭頂',el:'宇宙',seed:'OM',freq:963,mudra:'蓮花手印：雙手合十，指尖向外展開如蓮花',aff:'我與宇宙合一'}
+];
+let activeChakra=null;
+let chakraMarks={};
+try { chakraMarks=JSON.parse(localStorage.getItem('chakraMarks')||'{}'); } catch(e){ chakraMarks={}; }
+
+function renderChakra(){
+  document.getElementById('chakraMap').innerHTML=CHAKRAS.slice().reverse().map(c=>`
+    <div class="chakra-dot ${activeChakra===c.id?'active':''}" onclick="openChakra(${c.id})"
+      style="width:${28+c.id*4}px;height:${28+c.id*4}px;border-radius:50%;
+      background:radial-gradient(circle,${c.color}cc,${c.color}33);
+      box-shadow:0 0 ${8+c.id*3}px ${c.color}88;"></div>`).join('');
+  if(activeChakra) showDetail(activeChakra);
+}
+function openChakra(id){ activeChakra=id; renderChakra(); showDetail(id); }
+function showDetail(id){
+  const c=CHAKRAS.find(x=>x.id===id);
+  document.getElementById('chakraDetail').classList.remove('hidden');
+  document.getElementById('chakraName').textContent=c.name;
+  document.getElementById('chakraInfo').textContent=`${c.pos} · ${c.el} · 顏色 ${c.color}`;
+  document.getElementById('chakraAffirm').textContent='「'+c.aff+'」'+(chakraMarks[c.name]?`　（今日：${chakraMarks[c.name]}）`:'');
+  document.getElementById('chakraMudra').textContent = c.mudra;
+  document.getElementById('chakraSeed').textContent = '🔊 播放種子音：'+c.seed+'（'+c.freq+' Hz）';
+}
+function playSeed(){
+  if(!activeChakra) return;
+  const c=CHAKRAS.find(x=>x.id===activeChakra);
+  playFreq(c.freq, c.name);
+  speakText(c.seed);
+}
+function chakraMode(mode){
+  if(!activeChakra) return;
+  const c=CHAKRAS.find(x=>x.id===activeChakra);
+  let hz = c.freq;
+  if(mode==='activate'){ hz = c.freq; playBeat('Gamma 40Hz'); }
+  else if(mode==='heal'){ hz = c.freq; }
+  else if(mode==='repair'){ hz = 174; playBeat('Theta 6Hz'); }
+  else if(mode==='inspire'){ hz = 963; playBeat('Alpha 10Hz'); }
+  playFreq(hz, c.name);
+  const msgs = { activate: '激活模式：喚醒、提神、開啟。', heal: '療癒模式：修復、安撫、釋放。', repair: '修復模式：深層修復、細胞療癒。', inspire: '啟發模式：直覺、洞察、靈感。' };
+  speakText(msgs[mode]);
+}
+function markChakra(m){
+  const c=CHAKRAS.find(x=>x.id===activeChakra);
+  chakraMarks[c.name]=m;
+  localStorage.setItem('chakraMarks',JSON.stringify(chakraMarks));
+  const record = {date:new Date().toISOString().slice(0,10),chakra:c.name,mark:m};
+  let hist=[];
+  try { hist=JSON.parse(localStorage.getItem('chakraHistory')||'[]'); } catch(e){}
+  hist.push(record);
+  localStorage.setItem('chakraHistory',JSON.stringify(hist.slice(-200)));
+  syncToCloud('chakraHistory', record);
+  showDetail(activeChakra);
+}
+
+/* ===== JOURNAL ===== */
+const TAGS=['我自己領受','經文','身體感覺','夢境','不確定','Angel 象徵反思'];
+let selectedTags=new Set();
+function renderTags(){
+  document.getElementById('tagBox').innerHTML=TAGS.map(t=>`
+    <button onclick="toggleTag('${t}')" class="px-3 py-1.5 rounded-full text-xs border btn
+      ${selectedTags.has(t)?'bg-amber-400/20 border-amber-400/50 gold':'bg-white/5 border border-white/10 text-white/50'}">${t}</button>`).join('');
+}
+function toggleTag(t){ selectedTags.has(t)?selectedTags.delete(t):selectedTags.add(t); renderTags(); }
+function saveEntry(){
+  const before=document.getElementById('before').value.trim();
+  const after=document.getElementById('after').value.trim();
+  if(!before&&!after) return;
+  const entry = { id: Date.now().toString(), before, after, tags: [...selectedTags], time: new Date().toLocaleString('zh-HK') };
+  let entries=[];
+  try { entries=JSON.parse(localStorage.getItem('entries')||'[]'); } catch(e){}
+  entries.unshift(entry);
+  localStorage.setItem('entries',JSON.stringify(entries.slice(0,200)));
+  syncToCloud('entries', {before, after, tags:[...selectedTags], time:entry.time});
+  document.getElementById('before').value=''; document.getElementById('after').value='';
+  selectedTags.clear(); renderTags(); renderEntries();
+}
+function renderEntries(){
+  let entries=[];
+  try { entries=JSON.parse(localStorage.getItem('entries')||'[]'); } catch(e){}
+  const list=document.getElementById('entryList');
+  if(!entries.length){ list.innerHTML='<p class="text-xs text-white/30">未有記錄。</p>'; return; }
+  list.innerHTML=entries.map(e=>`
+    <div class="glass rounded-xl p-4 text-xs">
+      <div class="text-white/30 mb-2">${e.time||''}</div>
+      ${e.before?`<div class="mb-1"><span class="gold">前：</span>${esc(e.before)}</div>`:''}
+      ${e.after?`<div class="mb-2"><span class="gold">後：</span>${esc(e.after)}</div>`:''}
+      <div class="flex flex-wrap gap-1">${(e.tags||[]).map(t=>`<span class="px-2 py-0.5 rounded-full bg-white/5 text-[10px] text-white/40">${t}</span>`).join('')}</div>
+    </div>`).join('');
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ===== CRISIS ===== */
+const CRISIS=['自殺','唔想活','不想活','kill myself','suicide','自殘','結束生命'];
+document.addEventListener('input',e=>{
+  if(e.target.tagName!=='TEXTAREA'&&e.target.tagName!=='INPUT') return;
+  const v=e.target.value.toLowerCase();
+  if(CRISIS.some(k=>v.includes(k))){
+    const c=document.getElementById('crisis');
+    c.classList.remove('hidden'); c.classList.add('flex');
+  }
+});
+
+/* ===== ANGEL AGENT ===== */
+const SETTINGS_KEY='angel_settings';
+let bridgeSettings={mode:'D',apiKey:'',proxyUrl:'',thinking:false,persistChat:true,aiModel:'deepseek/deepseek-chat'};
+try { Object.assign(bridgeSettings,JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')); } catch(e){}
+
+function saveSettings(){
+  bridgeSettings.thinking=document.getElementById('thinkingToggle').checked;
+  bridgeSettings.persistChat=document.getElementById('persistChatToggle').checked;
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify(bridgeSettings));
+}
+function openSettings(){
+  document.getElementById('settingsModal').classList.remove('hidden');
+  document.getElementById('settingsModal').classList.add('flex');
+  document.querySelector(`input[name="chatMode"][value="${bridgeSettings.mode}"]`).checked=true;
+  showSettingsSection(bridgeSettings.mode);
+  if(bridgeSettings.apiKey) document.getElementById('apiKeyInput').value=bridgeSettings.apiKey;
+  if(bridgeSettings.proxyUrl) document.getElementById('proxyUrlInput').value=bridgeSettings.proxyUrl;
+  document.getElementById('thinkingToggle').checked=bridgeSettings.thinking;
+  document.getElementById('persistChatToggle').checked=bridgeSettings.persistChat;
+  document.getElementById('voiceSelect').value = voicePref;
+  document.getElementById('rateSlider').value = Math.round(ratePref*100);
+  document.getElementById('rateLabel').textContent = ratePref.toFixed(2);
+}
+function closeSettings(){
+  document.getElementById('settingsModal').classList.add('hidden');
+  document.getElementById('settingsModal').classList.remove('flex');
+}
+function setChatMode(mode){
+  bridgeSettings.mode=mode;
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify(bridgeSettings));
+  showSettingsSection(mode); updateModeBadge();
+}
+function showSettingsSection(mode){
+  document.getElementById('settingsA').classList.toggle('hidden',mode!=='A');
+  document.getElementById('settingsB').classList.toggle('hidden',mode!=='B');
+}
+function updateModeBadge(){
+  const labels={
+    'D':['Puter 免費 AI','真 AI · 免費無限'],
+    'C':['規則引擎模式','離線 · 零隱私風險'],
+    'A':['自備 API Key','真 AI · 你嘅額度'],
+    'B':['代理後端模式','真 AI · Worker 額度']
+  };
+  const [label,status]=labels[bridgeSettings.mode]||labels['D'];
+  document.getElementById('modeLabel').textContent=label;
+  document.getElementById('modeStatus').textContent=status;
+}
+function saveApiKey(){ const k=document.getElementById('apiKeyInput').value.trim(); if(!k)return; bridgeSettings.apiKey=k; localStorage.setItem(SETTINGS_KEY,JSON.stringify(bridgeSettings)); alert('API Key 已儲存。'); }
+function clearApiKey(){ bridgeSettings.apiKey=''; document.getElementById('apiKeyInput').value=''; localStorage.setItem(SETTINGS_KEY,JSON.stringify(bridgeSettings)); alert('API Key 已清除。'); }
+function saveProxyUrl(){ const u=document.getElementById('proxyUrlInput').value.trim(); if(!u)return; bridgeSettings.proxyUrl=u; localStorage.setItem(SETTINGS_KEY,JSON.stringify(bridgeSettings)); alert('Worker URL 已儲存。'); }
+
+/* ===== 🟢 新增：AI 模型選擇邏輯 ===== */
+function setAIModel(model) {
+  bridgeSettings.aiModel = model;
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(bridgeSettings));
+  updateModelUI();
+}
+
+function updateModelUI() {
+  const dsBtn = document.getElementById('modelDeepSeek');
+  const gptBtn = document.getElementById('modelGPT');
+  if (!dsBtn || !gptBtn) return;
+  
+  if (bridgeSettings.aiModel.includes('deepseek')) {
+    dsBtn.className = 'flex-1 py-2 rounded-xl bg-amber-400/20 border border-amber-400/50 text-xs gold btn';
+    gptBtn.className = 'flex-1 py-2 rounded-xl bg-white/5 border border-white/10 text-white/50 text-xs btn';
+  } else {
+    gptBtn.className = 'flex-1 py-2 rounded-xl bg-amber-400/20 border border-amber-400/50 text-xs gold btn';
+    dsBtn.className = 'flex-1 py-2 rounded-xl bg-white/5 border border-white/10 text-white/50 text-xs btn';
+  }
+}
+
+/* ===== 儲存並關閉所有設定 ===== */
+function saveAllSettings() {
+  const modeInput = document.querySelector('input[name="chatMode"]:checked');
+  if (modeInput) bridgeSettings.mode = modeInput.value;
+  
+  const apiKeyVal = document.getElementById('apiKeyInput').value.trim();
+  if (apiKeyVal) bridgeSettings.apiKey = apiKeyVal;
+  
+  const proxyVal = document.getElementById('proxyUrlInput').value.trim();
+  if (proxyVal) bridgeSettings.proxyUrl = proxyVal;
+  
+  bridgeSettings.voicePref = document.getElementById('voiceSelect').value;
+  voicePref = bridgeSettings.voicePref;
+  bridgeSettings.ratePref = parseInt(document.getElementById('rateSlider').value) / 100;
+  ratePref = bridgeSettings.ratePref;
+  
+  bridgeSettings.thinking = document.getElementById('thinkingToggle').checked;
+  bridgeSettings.persistChat = document.getElementById('persistChatToggle').checked;
+  
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(bridgeSettings));
+  localStorage.setItem('voicePref', voicePref);
+  localStorage.setItem('ratePref', ratePref);
+  
+  updateModeBadge();
+  closeSettings();
+  alert('✅ 設定已儲存！');
+}
+
+function resetSettings() {
+  if (!confirm('確定重置所有設定為默認？')) return;
+  bridgeSettings = {mode:'D',apiKey:'',proxyUrl:'',thinking:false,persistChat:true,aiModel:'deepseek/deepseek-chat'};
+  voicePref = 'default'; ratePref = 0.75;
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(bridgeSettings));
+  localStorage.setItem('voicePref', voicePref);
+  localStorage.setItem('ratePref', ratePref);
+  openSettings();
+  updateModelUI();
+  alert('✅ 已重置為默認設定。');
+}
+
+/* ===== 規則引擎 ===== */
+const RULE_RESPONSES={
+  reflection:['我聽到你講「{q}」。你願意停一停，感受一下呢句話喺你身體邊個位置引起反應？','你講嘅「{q}」…如果呢個感受有顏色，會係咩顏色？'],
+  inquiry:['你願意問自己：如果完全唔驚，你最想保護嘅係咩？','你願意問自己：呢個問題背後，你真正想要嘅係咩？','你願意問自己：如果答案已經喺你心入面，佢會係咩？'],
+  body:['留意一下，呢個感受喺身體邊個位置？心口？胃部？','慢慢深呼吸三次。每一次呼氣，將注意力放喺身體最緊嘅位置。'],
+  silence:['唔需要即刻答。等一分鐘，睇下有咩浮現。','畀自己三十秒嘅靜默。答案唔急。'],
+  scripture:['「應無所住而生其心。」—《金剛經》','「你們祈求，就給你們；尋找，就尋見。」—《馬太福音》7:7','「心無罣礙，無罣礙故，無有恐怖。」—《心經》']
+};
+function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function ruleEngineResponse(userText){
+  const t=userText.toLowerCase();
+  let category='inquiry';
+  if(t.includes('點做')||t.includes('應該')||t.includes('決定')) category='reflection';
+  else if(t.includes('驚')||t.includes('痛')||t.includes('苦')) category='body';
+  else if(t.includes('經文')||t.includes('聖經')||t.includes('佛')) category='scripture';
+  else if(t.includes('靜')||t.includes('等')||t.includes('慢')) category='silence';
+  let text=pickRandom(RULE_RESPONSES[category]||RULE_RESPONSES.inquiry);
+  return text.replace('{q}',userText.slice(0,20));
+}
+
+/* ===== 對話渲染 ===== */
+let chatHistory=[];
+try { chatHistory=JSON.parse(localStorage.getItem('chatHistory')||'[]'); } catch(e){}
+
+function renderChat(){
+  const area=document.getElementById('chatArea');
+  if(!chatHistory.length){
+    area.innerHTML=`<div class="text-center text-white/30 text-xs py-8">
+      <div class="text-2xl mb-2">🕊️</div>
+      <p>我係 Angel，一個象徵性嘅引導者。</p>
+      <p>我唔係高我、佛陀或基督。</p>
+      <p class="mt-2">你可以同我講你嘅問題，我會陪你慢慢睇。</p></div>`;
+    return;
+  }
+  area.innerHTML=chatHistory.map(m=>`
+    <div class="flex ${m.role==='user'?'justify-end':'justify-start'}">
+      <div class="max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
+        m.role==='user'?'bg-amber-500/20 border border-amber-400/30 text-white/90':'bg-white/5 border border-white/10 text-white/70'}">
+        <div class="text-[10px] text-white/30 mb-1">${m.role==='user'?'你':'🕊️ Angel'}</div>
+        <div class="script-line">${esc(m.content)}</div></div></div>`).join('');
+  area.scrollTop=area.scrollHeight;
+}
+
+function addMessage(role,content){
+  chatHistory.push({role,content,time:new Date().toISOString()});
+  if(chatHistory.length>60) chatHistory=chatHistory.slice(-60);
+  if(bridgeSettings.persistChat) localStorage.setItem('chatHistory',JSON.stringify(chatHistory));
+  renderChat();
+}
+
+function clearChat(){
+  if(!confirm('確定清空對話歷史？')) return;
+  chatHistory=[]; localStorage.removeItem('chatHistory'); renderChat();
+}
+
+async function sendMessage(){
+  const input=document.getElementById('chatInput');
+  const text=input.value.trim();
+  if(!text) return;
+  input.value='';
+  addMessage('user',text);
+
+  const loadingId='loading-'+Date.now();
+  const area=document.getElementById('chatArea');
+  area.innerHTML+=`<div id="${loadingId}" class="flex justify-start">
+    <div class="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm">
+      <div class="text-[10px] text-white/30 mb-1">🕊️ Angel</div>
+      <div class="flex gap-1"><span class="typing-dot">●</span><span class="typing-dot">●</span><span class="typing-dot">●</span></div></div></div>`;
+  area.scrollTop=area.scrollHeight;
+
+  try {
+    let reply;
+    if(bridgeSettings.mode==='C'){
+      await new Promise(r=>setTimeout(r,800));
+      reply=ruleEngineResponse(text);
+    } else {
+      reply=await callAI(text);
+    }
+    document.getElementById(loadingId)?.remove();
+    addMessage('assistant',reply);
+    speakText(reply);
+    if(currentUser) syncToCloud('chats',{user:text, angel:reply});
+  } catch(err){
+    document.getElementById(loadingId)?.remove();
+    addMessage('assistant',`⚠️ 錯誤：${err.message}`);
+  }
+}
+
+/* ===== callAI 函數 ===== */
+async function callAI(userText){
+  if(bridgeSettings.mode === 'D'){
+    try {
+      if (!await puter.auth.isSignedIn()) {
+        await puter.auth.signIn();
+      }
+      // 🟢 根據用戶選擇嘅模型去調用
+      const modelName = bridgeSettings.aiModel || 'deepseek/deepseek-chat';
+      
+      const response = await puter.ai.chat(userText, {
+        model: modelName,
+        temperature: 0.7
+      });
+      return response.message?.content || response || '冇回應。';
+    } catch (error) {
+      console.error('Puter AI 錯誤:', error);
+      throw new Error('Puter 免費 AI 暫時無法使用，請確認你已登入 Puter 帳戶。');
+    }
+  }
+
+  if(bridgeSettings.mode === 'A'){
+    if(!bridgeSettings.apiKey) throw new Error('請先喺設定入面輸入 DeepSeek API Key。');
+    const url = 'https://api.deepseek.com/chat/completions';
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${bridgeSettings.apiKey}`
+    };
+    const body = {
+      model: 'deepseek-chat',
+      messages: [{ role: 'user', content: userText }],
+      temperature: 0.7
+    };
+    const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+    if(!res.ok) throw new Error(`API 錯誤 ${res.status}`);
+    const data = await res.json();
+    return data.choices[0].message.content;
+  }
+
+  if(bridgeSettings.mode === 'B'){
+    if(!bridgeSettings.proxyUrl) throw new Error('請先喺設定入面輸入 Worker 代理 URL。');
+    const url = bridgeSettings.proxyUrl.replace(/\/$/,'') + '/api/chat';
+    const body = {
+      model: 'deepseek-chat',
+      messages: [{ role: 'user', content: userText }],
+      temperature: 0.7
+    };
+    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if(!res.ok) throw new Error(`API 錯誤 ${res.status}`);
+    const data = await res.json();
+    return data.choices[0].message.content;
+  }
+
+  throw new Error('未知模式。');
+}
+
+function quickAction(type){
+  const input=document.getElementById('chatInput');
+  const prompts={'靜心':'我想靜一靜，請引導我呼吸。','反問':'我有個問題想問自己。','經文':'請畀我一段經文反思。'};
+  input.value=prompts[type]||'';
+  sendMessage();
+}
+
+function saveChatToJournal(){
+  if(!chatHistory.length){ alert('未有對話。'); return; }
+  const lastUser=[...chatHistory].reverse().find(m=>m.role==='user');
+  const lastAI=[...chatHistory].reverse().find(m=>m.role==='assistant');
+  document.getElementById('after').value=(lastUser?.content||'')+'\n\n'+(lastAI?.content||'');
+  go('journal');
+}
+
+/* ===== INIT ===== */
+renderTags();
+document.getElementById('hypnoLangLabel').textContent=lang;
+updateModeBadge();
+updateModelUI(); // 🟢 初始化模型按鈕 UI
+renderChat();
+checkPuterAuth();
+</script>
+</body>
+</html>
